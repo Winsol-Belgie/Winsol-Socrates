@@ -1,6 +1,6 @@
 // app.js
 // Zet dit naar je Worker endpoint:
-const API_URL = "https://winsol-socrates.gwenn-vanthournout.workers.dev/ask";
+const API_URL = "https://winsol-socrates-live.gwenn-vanthournout.workers.dev/ask";
 
 const chat = document.getElementById("chat");
 const input = document.getElementById("input");
