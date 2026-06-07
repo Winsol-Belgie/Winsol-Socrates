@@ -9,15 +9,14 @@
   </head>
   <body>
     <main class="container">
-      
 
-      
-      <!-- HERO: titel + logo in wit kader (logo RECHTS) -->
+      <!-- HERO -->
       <header class="hero" role="banner" aria-label="Winsol SO!Crates header">
-        <h1 class="hero__title">Winsol SO!Crates (01-03-'26)</h1>
+        <h1 class="hero__title">Winsol SO!Crates (07-06-'26)</h1>
         <img class="hero__logo" src="SO-Crates_Logo_mini.png" alt="SO!Crates logo" />
       </header>
 
+      <!-- TOOLBAR -->
       <div class="toolbar">
         <div class="fields">
           <div class="language-box">
@@ -30,53 +29,552 @@
                 <option value="de">Deutsch</option>
                 <option value="es">Español</option>
                 <option value="it">Italiano</option>
-            <!--<option value="cs">Čeština</option>
-                <option value="sv">Svenska</option>
-                <option value="hr">Hrvatski</option>
-                <option value="hu">Magyar</option> -->             
               </select>
             </div>
-      
-            <!-- globe-icoon -->
             <svg class="lang-icon" viewBox="0 0 24 24">
               <path fill="#555" d="M12 2a10 10 0 100 20 10 10 0 000-20zm7.93 9h-3.05a15.1 15.1 0 00-1.12-5.18 8.03 8.03 0 014.17 5.18zM12 4c.88 1.14 1.57 2.71 1.97 4.5H10.03C10.43 6.71 11.12 5.14 12 4zm-3.76.82A15.1 15.1 0 006.12 11H3.07a8.03 8.03 0 015.17-6.18zM3.07 13h3.05a15.1 15.1 0 001.12 5.18A8.03 8.03 0 013.07 13zm8.93 7c-.88-1.14-1.57-2.71-1.97-4.5h3.94c-.4 1.79-1.09 3.36-1.97 4.5zm3.76-.82a15.1 15.1 0 001.12-5.18h3.05a8.03 8.03 0 01-4.17 5.18z"/>
             </svg>
-      
-            <!-- Knop 1: Mail -->
             <button type="button" id="mailBtn" class="btn-secondary">Mail</button>
-      
-            <!-- Knop 2: PDF-link -->
-            <a
-              id="pdfBtn"
-              class="btn-secondary"
-              href="https://winsolgroup.sharepoint.com/sites/SunprotectionAndOutdoorLiving/PublishedDocuments/Forms/BIB%20RD.aspx?viewid=9bb1db15%2D1a0f%2D4455%2Db0b0%2D0d2356e1ea0c&id=%2Fsites%2FSunprotectionAndOutdoorLiving%2FPublishedDocuments%2FPRODUCTS%2FPERGOLA%2FSO%21%2FSO%21%5FSPECS%5F2025%2D00%2Epdf&parent=%2Fsites%2FSunprotectionAndOutdoorLiving%2FPublishedDocuments%2FPRODUCTS%2FPERGOLA%2FSO%21"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              PDF
-            </a>
+            <a id="pdfBtn" class="btn-secondary"
+               href="https://winsolgroup.sharepoint.com/sites/SunprotectionAndOutdoorLiving/PublishedDocuments/Forms/BIB%20RD.aspx?viewid=9bb1db15%2D1a0f%2D4455%2Db0b0%2D0d2356e1ea0c&id=%2Fsites%2FSunprotectionAndOutdoorLiving%2FPublishedDocuments%2FPRODUCTS%2FPERGOLA%2FSO%21%2FSO%21%5FSPECS%5F2025%2D00%2Epdf&parent=%2Fsites%2FSunprotectionAndOutdoorLiving%2FPublishedDocuments%2FPRODUCTS%2FPERGOLA%2FSO%21"
+               target="_blank" rel="noopener noreferrer">PDF</a>
           </div>
         </div>
-      
         <div class="actions">
           <button id="resetBtn" title="New conversation">Reset</button>
         </div>
       </div>
 
-      <!-- CHAT -->
-      <div id="chat" class="chat" aria-live="polite"></div>
-
-      <!-- COMPOSER -->
-      <div class="composer">
-        <textarea id="input" rows="3" placeholder="Type your question... (Shift+Enter = new line)"></textarea>
-        <button id="sendBtn" class="primary">Send</button>
+      <!-- TABS -->
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="chat">Chat</button>
+        <button class="tab-btn" id="tab-btn-troubleshoot" data-tab="troubleshoot">Probleemoplossing</button>
+        <button class="tab-btn" data-tab="admin">Admin</button>
       </div>
 
-      <div id="status" class="status"></div>
-    
-      </main>
-      
+      <!-- TAB: CHAT -->
+      <div id="tab-chat" class="tab-panel active">
+        <div id="chat" class="chat" aria-live="polite"></div>
+        <div class="composer">
+          <textarea id="input" rows="3" placeholder="Type your question... (Shift+Enter = new line)"></textarea>
+          <button id="sendBtn" class="primary">Send</button>
+        </div>
+        <div id="status" class="status"></div>
+      </div>
 
+      <!-- TAB: PROBLEEMOPLOSSING -->
+      <div id="tab-troubleshoot" class="tab-panel">
+        <div class="ts-toolbar">
+          <div class="language-wrapper">
+            <select id="ts-component">
+              <option value="">— Kies component —</option>
+              <option value="screen">Screen</option>
+              <option value="led">LED</option>
+              <option value="lamel">Lamel</option>
+            </select>
+          </div>
+        </div>
+        <div id="ts-app">
+          <div class="ts-loading" id="ts-placeholder">Kies een component om te starten.</div>
+        </div>
+      </div>
+
+      <!-- TAB: ADMIN -->
+      <div id="tab-admin" class="tab-panel">
+
+        <!-- Login form -->
+        <div id="admin-login-form" class="ts-card">
+          <h2>🔒 Admin</h2>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <input type="password" id="admin-pw" placeholder="Wachtwoord"
+              style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:0.95rem;flex:1;min-width:180px;">
+            <button class="ts-btn primary ts-btn-sm" id="admin-login-btn">Inloggen</button>
+          </div>
+          <div id="admin-login-error" style="color:#c53030;font-size:0.85rem;margin-top:8px;min-height:1.2em;"></div>
+        </div>
+
+        <!-- Admin panel (verborgen tot login) -->
+        <div id="admin-panel" style="display:none;">
+
+          <!-- Matrix sectie -->
+          <div class="ts-card" style="margin-bottom:12px;">
+            <h2>📊 Matrix updaten</h2>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;">
+              <div class="language-wrapper">
+                <select id="admin-component">
+                  <option value="screen">Screen</option>
+                  <option value="led">LED</option>
+                  <option value="lamel">Lamel</option>
+                </select>
+              </div>
+              <label class="ts-btn secondary ts-btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+                📂 Kies Excel-bestand
+                <input type="file" id="admin-excel-file" accept=".xlsx" style="display:none;">
+              </label>
+            </div>
+            <div id="admin-excel-name" style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;min-height:1.2em;"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="ts-btn secondary ts-btn-sm" id="admin-parse-btn" disabled>Verwerk Excel</button>
+              <button class="ts-btn primary ts-btn-sm" id="admin-matrix-upload-btn" disabled>Uploaden naar KV</button>
+            </div>
+            <div id="admin-matrix-preview" style="font-size:0.88rem;color:var(--muted);margin-top:10px;min-height:1.2em;"></div>
+            <div id="admin-matrix-status" style="font-size:0.88rem;margin-top:6px;min-height:1.2em;"></div>
+          </div>
+
+          <!-- PNG sectie -->
+          <div class="ts-card">
+            <h2>🖼️ PNG's uploaden</h2>
+            <p style="font-size:0.85rem;color:var(--muted);margin:0 0 12px;">
+              PNG-bestandsnamen beginnen met de oorzaakcode (bv. <code>SC05-01.png</code>).
+              Na het uploaden zijn ze beschikbaar via de Worker.
+            </p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;">
+              <label class="ts-btn secondary ts-btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+                📂 Kies PNG-bestanden
+                <input type="file" id="admin-png-files" accept=".png,image/png" multiple style="display:none;">
+              </label>
+              <button class="ts-btn primary ts-btn-sm" id="admin-png-upload-btn" disabled>Uploaden</button>
+            </div>
+            <div id="admin-png-list" style="font-size:0.85rem;color:var(--muted);margin-bottom:8px;min-height:1.2em;"></div>
+            <div id="admin-png-status" style="font-size:0.88rem;margin-top:6px;"></div>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script type="module" src="app.js"></script>
+
+    <script>
+    // ── Tab switching ────────────────────────────────────────────────────────
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+      });
+    });
+
+    // ── Troubleshoot tool ────────────────────────────────────────────────────
+    const TS_API = "https://winsol-socrates-dev.gwenn-vanthournout.workers.dev";
+
+    const tsLabels = {
+      nl: { loading:"Matrix laden…", chooseControl:"Type aansturing?", chooseComplaint:"Wat is het probleem?",
+            solved:"✓ Opgelost", notHelped:"→ Volgende oorzaak", prev:"← Vorige oorzaak",
+            doneSolved:"Probleem opgelost!", doneNoMore:'Geen verdere oorzaak. Neem contact op met <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>.',
+            restart:"Opnieuw starten", noMatrix:"Matrix niet beschikbaar voor dit component.", start:"Kies een component om te starten.",
+            labelCause:"Mogelijke oorzaak", labelAction:"Voorgestelde actie",
+            tabTroubleshoot:"Probleemoplossing", linkText:"Zie link voor meer uitleg" },
+      fr: { loading:"Chargement…", chooseControl:"Type de commande ?", chooseComplaint:"Quel est le problème ?",
+            solved:"✓ Résolu", notHelped:"→ Cause suivante", prev:"← Cause précédente",
+            doneSolved:"Problème résolu !", doneNoMore:'Aucune autre cause. Contactez <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>.',
+            restart:"Recommencer", noMatrix:"Matrice non disponible.", start:"Choisissez un composant.",
+            labelCause:"Cause possible", labelAction:"Action suggérée",
+            tabTroubleshoot:"Dépannage", linkText:"Voir le lien pour plus d'informations" },
+      en: { loading:"Loading…", chooseControl:"Control type?", chooseComplaint:"What is the problem?",
+            solved:"✓ Solved", notHelped:"→ Next cause", prev:"← Previous cause",
+            doneSolved:"Problem solved!", doneNoMore:'No further cause found. Contact <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>.',
+            restart:"Start over", noMatrix:"Matrix not available.", start:"Choose a component.",
+            labelCause:"Possible cause", labelAction:"Suggested action",
+            tabTroubleshoot:"Troubleshooting", linkText:"See link for more information" },
+      de: { loading:"Wird geladen…", chooseControl:"Steuerungstyp?", chooseComplaint:"Was ist das Problem?",
+            solved:"✓ Gelöst", notHelped:"→ Nächste Ursache", prev:"← Vorherige Ursache",
+            doneSolved:"Problem gelöst!", doneNoMore:'Keine weiteren Ursachen. Kontakt: <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>.',
+            restart:"Neu starten", noMatrix:"Matrix nicht verfügbar.", start:"Komponente wählen.",
+            labelCause:"Mögliche Ursache", labelAction:"Empfohlene Maßnahme",
+            tabTroubleshoot:"Fehlerbehebung", linkText:"Siehe Link für weitere Informationen" },
+      es: { loading:"Cargando…", chooseControl:"¿Tipo de control?", chooseComplaint:"¿Cuál es el problema?",
+            solved:"✓ Resuelto", notHelped:"→ Causa siguiente", prev:"← Causa anterior",
+            doneSolved:"¡Problema resuelto!", doneNoMore:'Sin más causas. Contacte: <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>.',
+            restart:"Reiniciar", noMatrix:"Matriz no disponible.", start:"Elija un componente.",
+            labelCause:"Posible causa", labelAction:"Acción sugerida",
+            tabTroubleshoot:"Solución de problemas", linkText:"Ver enlace para más información" },
+      it: { loading:"Caricamento…", chooseControl:"Tipo di controllo?", chooseComplaint:"Qual è il problema?",
+            solved:"✓ Risolto", notHelped:"→ Causa successiva", prev:"← Causa precedente",
+            doneSolved:"Problema risolto!", doneNoMore:'Nessun\'altra causa. Contattare: <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>.',
+            restart:"Ricominciare", noMatrix:"Matrice non disponibile.", start:"Scegliere un componente.",
+            labelCause:"Possibile causa", labelAction:"Azione suggerita",
+            tabTroubleshoot:"Risoluzione dei problemi", linkText:"Vedi link per ulteriori informazioni" },
+    };
+
+    function tsT() {
+      const l = (document.getElementById("language").value || "auto");
+      const code = l === "auto" ? (navigator.language || "nl").slice(0,2) : l;
+      return tsLabels[code] || tsLabels.nl;
+    }
+
+    let tsMatrix = null, tsControl = null, tsComplaint = null, tsCauses = [], tsStep = 0;
+    const tsApp = () => document.getElementById("ts-app");
+
+    function tsRender(html) { tsApp().innerHTML = html; }
+
+    function tsCard(title, body) {
+      return `<div class="ts-card"><h2>${title}</h2>${body}</div>`;
+    }
+
+    function tsShowControl() {
+      const ri = tsMatrix.required_info[0];
+      let btns = ri.opties.map((opt, i) =>
+        `<button class="ts-btn" data-idx="${i}">${opt}</button>`).join("");
+      tsRender(tsCard(ri.vraag, `<div class="ts-btn-list">${btns}</div>`));
+      tsApp().querySelectorAll(".ts-btn").forEach((btn, i) => {
+        btn.addEventListener("click", () => {
+          tsControl = ri.opties[i].toLowerCase().includes("casambi") ? "casambi" : "somfy";
+          tsShowComplaints();
+        });
+      });
+    }
+
+    function tsApplicableComplaints() {
+      return tsMatrix.complaints.filter(c =>
+        c.klacht && c.oorzaken_volgorde.some(code => {
+          const cause = tsMatrix.causes[code];
+          return cause && ((tsControl === "casambi" && cause.casambi) || (tsControl === "somfy" && cause.somfy));
+        })
+      );
+    }
+
+    function tsShowComplaints() {
+      const list = tsApplicableComplaints();
+      let btns = list.map((c, i) => `<button class="ts-btn" data-idx="${i}">${c.klacht}</button>`).join("");
+      tsRender(tsCard(tsT().chooseComplaint, `<div class="ts-btn-list">${btns}</div>`));
+      tsApp().querySelectorAll(".ts-btn").forEach((btn, i) => {
+        btn.addEventListener("click", () => { tsComplaint = list[i]; tsStartDiagnosis(); });
+      });
+    }
+
+    function tsStartDiagnosis() {
+      tsCauses = tsComplaint.oorzaken_volgorde.filter(code => {
+        const c = tsMatrix.causes[code];
+        return c && ((tsControl === "casambi" && c.casambi) || (tsControl === "somfy" && c.somfy));
+      });
+      tsStep = 0;
+      tsShowStep();
+    }
+
+    function tsShowStep() {
+      if (tsStep >= tsCauses.length) { tsShowDone(false); return; }
+      const cause = tsMatrix.causes[tsCauses[tsStep]];
+      const n = tsStep + 1, total = tsCauses.length;
+      const linkHtml = cause.link
+        ? `<div class="ts-step-link"><a href="${cause.link}" target="_blank" rel="noopener noreferrer">${tsT().linkText}</a></div>`
+        : "";
+      const imagesHtml = (cause.images && cause.images.length)
+        ? `<div class="ts-step-images">${cause.images.map(f =>
+            `<img src="${TS_API}/png/${f}" alt="${f}" class="ts-step-img" loading="lazy" />`
+          ).join("")}</div>`
+        : "";
+      tsRender(`<div class="ts-card">
+        <div class="ts-step-header">
+          <div class="ts-step-badge">${n} / ${total}</div>
+          <div class="ts-action-row">
+            <button class="ts-btn secondary ts-btn-sm" id="ts-prev" style="${tsStep === 0 ? 'visibility:hidden' : ''}">${tsT().prev}</button>
+            <button class="ts-btn primary ts-btn-sm" id="ts-solved">${tsT().solved}</button>
+            <button class="ts-btn secondary ts-btn-sm" id="ts-next">${tsT().notHelped}</button>
+          </div>
+        </div>
+        <div class="ts-complaint-label">${tsComplaint.klacht}</div>
+        ${cause.omschrijving ? `<div class="ts-step-field"><span class="ts-step-label">${tsT().labelCause}:</span> ${cause.omschrijving}</div>` : ""}
+        <div class="ts-step-field"><span class="ts-step-label">${tsT().labelAction}:</span> ${cause.oplossing}</div>
+        ${imagesHtml}
+        ${linkHtml}
+      </div>`);
+      document.getElementById("ts-prev").addEventListener("click", () => { if (tsStep > 0) { tsStep--; tsShowStep(); } });
+      document.getElementById("ts-solved").addEventListener("click", () => tsShowDone(true));
+      document.getElementById("ts-next").addEventListener("click", () => { tsStep++; tsShowStep(); });
+    }
+
+    function tsShowDone(solved) {
+      const msg = solved ? tsT().doneSolved : tsT().doneNoMore;
+      tsRender(`<div class="ts-card ts-done">
+        <h2>${msg}</h2>
+        <button class="ts-btn primary" id="ts-restart">${tsT().restart}</button>
+      </div>`);
+      document.getElementById("ts-restart").addEventListener("click", tsReset);
+    }
+
+    function tsReset() {
+      tsControl = null; tsComplaint = null; tsCauses = []; tsStep = 0;
+      if (tsMatrix) tsShowControl();
+    }
+
+    async function tsLoad() {
+      const component = document.getElementById("ts-component").value;
+      const lang = (document.getElementById("language").value || "auto");
+      const langCode = lang === "auto" ? (navigator.language || "nl").slice(0,2) : lang;
+      if (!component) { tsRender(`<div class="ts-loading">${tsT().start}</div>`); return; }
+      tsRender(`<div class="ts-loading">${tsT().loading}</div>`);
+      try {
+        const res = await fetch(`${TS_API}/matrix?component=${component}&language=${langCode}`);
+        if (!res.ok) throw new Error(res.status);
+        tsMatrix = await res.json();
+        tsControl = null; tsComplaint = null; tsCauses = []; tsStep = 0;
+        tsShowControl();
+      } catch {
+        tsRender(`<div class="ts-card"><div class="ts-error">${tsT().noMatrix}</div></div>`);
+      }
+    }
+
+    // Tab-label bijwerken bij taalwissel
+    function tsUpdateTabLabel() {
+      document.getElementById("tab-btn-troubleshoot").textContent = tsT().tabTroubleshoot;
+    }
+    tsUpdateTabLabel(); // initieel instellen
+
+    // Component select: change én herselect van dezelfde waarde triggeren tsLoad
+    (function() {
+      const sel = document.getElementById("ts-component");
+      let _prev = "";
+      sel.addEventListener("mousedown", function() {
+        _prev = this.value;
+        this.value = ""; // zodat change altijd vuurt, ook bij dezelfde keuze
+      });
+      sel.addEventListener("change", function() {
+        _prev = "";
+        tsLoad();
+      });
+      sel.addEventListener("blur", function() {
+        if (!this.value && _prev) this.value = _prev; // herstel bij Escape/klik-buiten
+        _prev = "";
+      });
+    })();
+    document.getElementById("language").addEventListener("change", () => {
+      tsUpdateTabLabel();
+      if (document.getElementById("ts-component").value) tsLoad();
+    });
+
+    // ── Admin tab ────────────────────────────────────────────────────────────
+    let adminPassword = null;
+    let adminParsedMatrix = null;
+    let adminPngFiles = [];
+
+    // Login
+    document.getElementById("admin-login-btn").addEventListener("click", adminLogin);
+    document.getElementById("admin-pw").addEventListener("keydown", e => { if (e.key === "Enter") adminLogin(); });
+
+    async function adminLogin() {
+      const pw = document.getElementById("admin-pw").value.trim();
+      if (!pw) return;
+      document.getElementById("admin-login-error").textContent = "";
+      try {
+        const res = await fetch(`${TS_API}/admin/ping`, { headers: { "X-Admin-Password": pw } });
+        if (res.ok) {
+          adminPassword = pw;
+          document.getElementById("admin-login-form").style.display = "none";
+          document.getElementById("admin-panel").style.display = "block";
+        } else {
+          document.getElementById("admin-login-error").textContent = "Verkeerd wachtwoord.";
+        }
+      } catch {
+        document.getElementById("admin-login-error").textContent = "Verbinding mislukt.";
+      }
+    }
+
+    // Excel bestand kiezen
+    document.getElementById("admin-excel-file").addEventListener("change", function () {
+      const f = this.files[0];
+      if (f) {
+        document.getElementById("admin-excel-name").textContent = f.name;
+        document.getElementById("admin-parse-btn").disabled = false;
+        document.getElementById("admin-matrix-upload-btn").disabled = true;
+        document.getElementById("admin-matrix-preview").textContent = "";
+        document.getElementById("admin-matrix-status").textContent = "";
+        adminParsedMatrix = null;
+      }
+    });
+
+    // Excel verwerken met SheetJS
+    document.getElementById("admin-parse-btn").addEventListener("click", async () => {
+      const file = document.getElementById("admin-excel-file").files[0];
+      const component = document.getElementById("admin-component").value;
+      if (!file) return;
+      const preview = document.getElementById("admin-matrix-preview");
+      preview.textContent = "Bezig met verwerken…";
+      document.getElementById("admin-matrix-upload-btn").disabled = true;
+      try {
+        const data = await file.arrayBuffer();
+        const workbook = XLSX.read(data, { type: "array" });
+        const ws = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
+        const matrix = adminParseExcel(rows, component);
+
+        // Auto-koppel PNG's op basis van naamconventie (bijv. LC01-01.png → oorzaak LC01)
+        try {
+          const pngRes = await fetch(`${TS_API}/admin/png-list`, {
+            headers: { "X-Admin-Password": adminPassword }
+          });
+          if (pngRes.ok) {
+            const { files } = await pngRes.json();
+            for (const code of Object.keys(matrix.causes)) {
+              const matching = files
+                .filter(f => f.toLowerCase().startsWith(code.toLowerCase() + "-") ||
+                             f.toLowerCase().startsWith(code.toLowerCase() + "."))
+                .sort();
+              if (matching.length) matrix.causes[code].images = matching;
+            }
+          }
+        } catch { /* niet-kritiek */ }
+
+        adminParsedMatrix = matrix;
+        const nLinks  = Object.values(matrix.causes).filter(c => c.link).length;
+        const nImages = Object.values(matrix.causes).filter(c => c.images?.length).length;
+        preview.textContent = `✓ ${matrix.complaints.length} klachten · ${Object.keys(matrix.causes).length} oorzaken · ${nLinks} links · ${nImages} met afbeeldingen`;
+        document.getElementById("admin-matrix-upload-btn").disabled = false;
+      } catch (err) {
+        preview.textContent = `Fout bij verwerken: ${err.message}`;
+      }
+    });
+
+    function adminParseExcel(rows, componentName) {
+      const dataRows = rows.slice(1);
+      const required_info = [], complaints = [], causes = {};
+      const seenRI = new Set(), seenC = new Set();
+      for (const row of dataRows) {
+        const a = String(row[0] || "").trim();
+        const b = String(row[1] || "").trim();
+        if (a && b && !seenRI.has(a)) {
+          seenRI.add(a);
+          required_info.push({
+            code: a,
+            vraag: b,
+            opties: String(row[2] || "").split(",").map(s => s.trim()).filter(Boolean),
+          });
+        }
+        const d = String(row[3] || "").trim();
+        const e = String(row[4] || "").trim();
+        if (d && e && !seenC.has(d)) {
+          seenC.add(d);
+          complaints.push({
+            code: d,
+            klacht: e,
+            oorzaken_volgorde: String(row[5] || "").split(",").map(s => s.trim()).filter(Boolean),
+          });
+        }
+        const g = String(row[6] || "").trim();
+        const j = String(row[9] || "").trim();
+        if (g && j && !causes[g]) {
+          const entry = {
+            casambi: String(row[7] || "").trim().toLowerCase() === "ja",
+            somfy:   String(row[8] || "").trim().toLowerCase() === "ja",
+            omschrijving: j,
+            oplossing:    String(row[10] || "").trim(),
+          };
+          const link = String(row[11] || "").trim();
+          if (link) entry.link = link;
+          causes[g] = entry;
+        }
+      }
+      return { component: componentName.toLowerCase(), required_info, complaints, causes };
+    }
+
+    // Matrix uploaden naar KV
+    document.getElementById("admin-matrix-upload-btn").addEventListener("click", async () => {
+      if (!adminParsedMatrix) return;
+      const statusEl = document.getElementById("admin-matrix-status");
+      statusEl.textContent = "Bezig met uploaden…";
+      try {
+        const res = await fetch(`${TS_API}/admin/matrix`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Admin-Password": adminPassword },
+          body: JSON.stringify(adminParsedMatrix),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          statusEl.innerHTML = `<span style="color:green">✓ ${data.key} bijgewerkt (${data.complaints} klachten, ${data.causes} oorzaken)</span>`;
+        } else {
+          statusEl.innerHTML = `<span style="color:#c53030">Fout: ${data.error}</span>`;
+        }
+      } catch (err) {
+        statusEl.innerHTML = `<span style="color:#c53030">Fout: ${err.message}</span>`;
+      }
+    });
+
+    // PNG bestanden kiezen
+    document.getElementById("admin-png-files").addEventListener("change", function () {
+      adminPngFiles = Array.from(this.files);
+      const listEl = document.getElementById("admin-png-list");
+      const btn    = document.getElementById("admin-png-upload-btn");
+      if (adminPngFiles.length) {
+        listEl.textContent = adminPngFiles.map(f => f.name).join(", ");
+        btn.disabled = false;
+        btn.textContent = `Uploaden (${adminPngFiles.length} bestand${adminPngFiles.length > 1 ? "en" : ""})`;
+      } else {
+        listEl.textContent = "";
+        btn.disabled = true;
+        btn.textContent = "Uploaden";
+      }
+      document.getElementById("admin-png-status").textContent = "";
+    });
+
+    // PNG's uploaden naar KV
+    document.getElementById("admin-png-upload-btn").addEventListener("click", async () => {
+      if (!adminPngFiles.length) return;
+      const statusEl = document.getElementById("admin-png-status");
+      statusEl.textContent = "Bezig met uploaden…";
+      const results = [];
+      for (const file of adminPngFiles) {
+        try {
+          const buf = await file.arrayBuffer();
+          const res = await fetch(`${TS_API}/admin/png`, {
+            method: "POST",
+            headers: { "Content-Type": "image/png", "X-Admin-Password": adminPassword, "X-Filename": file.name },
+            body: buf,
+          });
+          const d = await res.json();
+          if (res.ok) results.push({ name: file.name, ok: true,  info: `${Math.round(d.bytes / 1024)} KB${d.matrixPatched ? " · matrix bijgewerkt" : ""}` });
+          else        results.push({ name: file.name, ok: false, info: d.error || res.status });
+        } catch (err) {
+          results.push({ name: file.name, ok: false, info: err.message });
+        }
+      }
+      const okCount = results.filter(r => r.ok).length;
+      statusEl.innerHTML = results.map(r =>
+        `<div style="color:${r.ok ? "green" : "#c53030"}">${r.ok ? "✓" : "✗"} ${r.name} <span style="color:var(--muted)">(${r.info})</span></div>`
+      ).join("") + `<div style="margin-top:6px;font-weight:600">${okCount} van ${results.length} gelukt</div>`;
+    });
+
+    // ── Reset knop: ook troubleshoot en admin resetten ───────────────────────
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      const tsActive    = document.getElementById("tab-troubleshoot").classList.contains("active");
+      const adminActive = document.getElementById("tab-admin").classList.contains("active");
+
+      if (tsActive) {
+        tsMatrix = null; tsControl = null; tsComplaint = null; tsCauses = []; tsStep = 0;
+        document.getElementById("ts-component").value = "";
+        tsRender(`<div class="ts-loading">${tsT().start}</div>`);
+      }
+
+      if (adminActive) {
+        // Uitloggen + formulierstatus wissen
+        adminPassword      = null;
+        adminParsedMatrix  = null;
+        adminPngFiles      = [];
+
+        // Login-formulier terug tonen
+        document.getElementById("admin-login-form").style.display = "block";
+        document.getElementById("admin-panel").style.display      = "none";
+        document.getElementById("admin-pw").value                 = "";
+        document.getElementById("admin-login-error").textContent  = "";
+
+        // Matrix-sectie wissen
+        document.getElementById("admin-excel-name").textContent       = "";
+        document.getElementById("admin-matrix-preview").textContent   = "";
+        document.getElementById("admin-matrix-status").textContent    = "";
+        document.getElementById("admin-parse-btn").disabled           = true;
+        document.getElementById("admin-matrix-upload-btn").disabled   = true;
+        document.getElementById("admin-excel-file").value             = "";
+
+        // PNG-sectie wissen
+        document.getElementById("admin-png-list").textContent         = "";
+        document.getElementById("admin-png-status").textContent       = "";
+        document.getElementById("admin-png-upload-btn").disabled      = true;
+        document.getElementById("admin-png-upload-btn").textContent   = "Uploaden";
+        document.getElementById("admin-png-files").value              = "";
+      }
+    });
+    </script>
   </body>
 </html>
