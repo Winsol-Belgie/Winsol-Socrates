@@ -167,37 +167,43 @@
             doneSolved:"Probleem opgelost!", doneNoMore:'Geen verdere oorzaak. Neem contact op met <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>.',
             restart:"Opnieuw starten", noMatrix:"Matrix niet beschikbaar voor dit component.", start:"Kies een component om te starten.",
             labelCause:"Mogelijke oorzaak", labelAction:"Voorgestelde actie",
-            tabTroubleshoot:"Probleemoplossing", linkText:"Zie link voor meer uitleg" },
+            tabTroubleshoot:"Probleemoplossing", linkText:"Zie link voor meer uitleg",
+            chooseComponent:"— Kies component —", compScreen:"Screen", compLed:"LED", compLamel:"Lamel" },
       fr: { loading:"Chargement…", chooseControl:"Type de commande ?", chooseComplaint:"Quel est le problème ?",
             solved:"✓ Résolu", notHelped:"→ Cause suivante", prev:"← Cause précédente",
             doneSolved:"Problème résolu !", doneNoMore:'Aucune autre cause. Contactez <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>.',
             restart:"Recommencer", noMatrix:"Matrice non disponible.", start:"Choisissez un composant.",
             labelCause:"Cause possible", labelAction:"Action suggérée",
-            tabTroubleshoot:"Dépannage", linkText:"Voir le lien pour plus d'informations" },
+            tabTroubleshoot:"Dépannage", linkText:"Voir le lien pour plus d'informations",
+            chooseComponent:"— Choisir le composant —", compScreen:"Screen", compLed:"LED", compLamel:"Lame" },
       en: { loading:"Loading…", chooseControl:"Control type?", chooseComplaint:"What is the problem?",
             solved:"✓ Solved", notHelped:"→ Next cause", prev:"← Previous cause",
             doneSolved:"Problem solved!", doneNoMore:'No further cause found. Contact <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>.',
             restart:"Start over", noMatrix:"Matrix not available.", start:"Choose a component.",
             labelCause:"Possible cause", labelAction:"Suggested action",
-            tabTroubleshoot:"Troubleshooting", linkText:"See link for more information" },
+            tabTroubleshoot:"Troubleshooting", linkText:"See link for more information",
+            chooseComponent:"— Choose component —", compScreen:"Screen", compLed:"LED", compLamel:"Louvre" },
       de: { loading:"Wird geladen…", chooseControl:"Steuerungstyp?", chooseComplaint:"Was ist das Problem?",
             solved:"✓ Gelöst", notHelped:"→ Nächste Ursache", prev:"← Vorherige Ursache",
             doneSolved:"Problem gelöst!", doneNoMore:'Keine weiteren Ursachen. Kontakt: <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>.',
             restart:"Neu starten", noMatrix:"Matrix nicht verfügbar.", start:"Komponente wählen.",
             labelCause:"Mögliche Ursache", labelAction:"Empfohlene Maßnahme",
-            tabTroubleshoot:"Fehlerbehebung", linkText:"Siehe Link für weitere Informationen" },
+            tabTroubleshoot:"Fehlerbehebung", linkText:"Siehe Link für weitere Informationen",
+            chooseComponent:"— Komponente wählen —", compScreen:"Screen", compLed:"LED", compLamel:"Lamelle" },
       es: { loading:"Cargando…", chooseControl:"¿Tipo de control?", chooseComplaint:"¿Cuál es el problema?",
             solved:"✓ Resuelto", notHelped:"→ Causa siguiente", prev:"← Causa anterior",
             doneSolved:"¡Problema resuelto!", doneNoMore:'Sin más causas. Contacte: <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>.',
             restart:"Reiniciar", noMatrix:"Matriz no disponible.", start:"Elija un componente.",
             labelCause:"Posible causa", labelAction:"Acción sugerida",
-            tabTroubleshoot:"Solución de problemas", linkText:"Ver enlace para más información" },
+            tabTroubleshoot:"Solución de problemas", linkText:"Ver enlace para más información",
+            chooseComponent:"— Elegir componente —", compScreen:"Screen", compLed:"LED", compLamel:"Lama" },
       it: { loading:"Caricamento…", chooseControl:"Tipo di controllo?", chooseComplaint:"Qual è il problema?",
             solved:"✓ Risolto", notHelped:"→ Causa successiva", prev:"← Causa precedente",
             doneSolved:"Problema risolto!", doneNoMore:'Nessun\'altra causa. Contattare: <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>.',
             restart:"Ricominciare", noMatrix:"Matrice non disponibile.", start:"Scegliere un componente.",
             labelCause:"Possibile causa", labelAction:"Azione suggerita",
-            tabTroubleshoot:"Risoluzione dei problemi", linkText:"Vedi link per ulteriori informazioni" },
+            tabTroubleshoot:"Risoluzione dei problemi", linkText:"Vedi link per ulteriori informazioni",
+            chooseComponent:"— Scegliere componente —", compScreen:"Screen", compLed:"LED", compLamel:"Lamella" },
     };
 
     function tsT() {
@@ -318,11 +324,22 @@
       }
     }
 
-    // Tab-label bijwerken bij taalwissel
+    // Tab-label en component-dropdown bijwerken bij taalwissel
     function tsUpdateTabLabel() {
       document.getElementById("tab-btn-troubleshoot").textContent = tsT().tabTroubleshoot;
     }
-    tsUpdateTabLabel(); // initieel instellen
+
+    function tsUpdateComponentLabels() {
+      const t = tsT();
+      const sel = document.getElementById("ts-component");
+      sel.options[0].text = t.chooseComponent;
+      sel.options[1].text = t.compScreen;
+      sel.options[2].text = t.compLed;
+      sel.options[3].text = t.compLamel;
+    }
+
+    tsUpdateTabLabel();
+    tsUpdateComponentLabels(); // initieel instellen
 
     // Component select: change én herselect van dezelfde waarde triggeren tsLoad
     (function() {
@@ -343,6 +360,7 @@
     })();
     document.getElementById("language").addEventListener("change", () => {
       tsUpdateTabLabel();
+      tsUpdateComponentLabels();
       if (document.getElementById("ts-component").value) tsLoad();
     });
 
