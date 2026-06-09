@@ -139,6 +139,20 @@
             <div id="admin-png-status" style="font-size:0.88rem;margin-top:6px;"></div>
           </div>
 
+          <!-- Logs sectie -->
+          <div class="ts-card" style="margin-top:12px;">
+            <h2>📋 Logs</h2>
+            <p style="font-size:0.85rem;color:var(--muted);margin:0 0 12px;">
+              Elke vraag en het bijhorende antwoord worden opgeslagen in de LOGS KV (bewaard gedurende 90 dagen).
+            </p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+              <button class="ts-btn secondary ts-btn-sm" id="admin-logs-fetch-btn">📥 LOG's ophalen</button>
+              <button class="ts-btn danger ts-btn-sm" id="admin-logs-reset-btn">🗑️ LOG's resetten</button>
+            </div>
+            <div id="admin-logs-status" style="font-size:0.85rem;color:var(--muted);margin-bottom:8px;min-height:1.2em;"></div>
+            <div id="admin-logs-display" style="font-size:0.82rem;max-height:420px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;padding:0 10px;"></div>
+          </div>
+
         </div>
       </div>
 
@@ -591,8 +605,62 @@
         document.getElementById("admin-png-upload-btn").disabled      = true;
         document.getElementById("admin-png-upload-btn").textContent   = "Uploaden";
         document.getElementById("admin-png-files").value              = "";
+
+        // Logs-sectie wissen
+        document.getElementById("admin-logs-status").textContent  = "";
+        document.getElementById("admin-logs-display").innerHTML   = "";
       }
     });
+
+    // ── LOG's ophalen ────────────────────────────────────────────────────────
+    document.getElementById("admin-logs-fetch-btn").addEventListener("click", async () => {
+      const statusEl  = document.getElementById("admin-logs-status");
+      const displayEl = document.getElementById("admin-logs-display");
+      statusEl.textContent = "Ophalen...";
+      displayEl.innerHTML  = "";
+      try {
+        const res  = await fetch(`${TS_API}/admin/logs`, { headers: { "X-Admin-Password": adminPassword } });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Fout bij ophalen");
+        statusEl.textContent = `${data.count} log${data.count !== 1 ? "s" : ""} gevonden`;
+        if (!data.logs.length) {
+          displayEl.innerHTML = "<p style='padding:8px;color:var(--muted)'>Geen logs beschikbaar.</p>";
+        } else {
+          displayEl.innerHTML = data.logs.map(l => `
+            <div style="border-bottom:1px solid var(--border);padding:10px 0;">
+              <div style="color:var(--muted);font-size:0.78rem;margin-bottom:4px;">
+                🕐 ${l.ts ? new Date(l.ts).toLocaleString("nl-BE") : "?"}
+                &nbsp;·&nbsp; 🌐 ${l.lang || "?"}
+              </div>
+              <div style="margin-bottom:4px;"><strong>❓ Vraag:</strong> ${escHtml(l.query || "")}</div>
+              <div><strong>💬 Antwoord:</strong> ${escHtml(l.answer || "")}</div>
+            </div>
+          `).join("");
+        }
+      } catch (e) {
+        statusEl.textContent = `Fout: ${e.message}`;
+      }
+    });
+
+    // ── LOG's resetten ───────────────────────────────────────────────────────
+    document.getElementById("admin-logs-reset-btn").addEventListener("click", async () => {
+      if (!confirm("Alle logs permanent verwijderen?")) return;
+      const statusEl = document.getElementById("admin-logs-status");
+      statusEl.textContent = "Resetten...";
+      try {
+        const res  = await fetch(`${TS_API}/admin/logs-reset`, { method: "POST", headers: { "X-Admin-Password": adminPassword } });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Fout bij resetten");
+        statusEl.textContent = `✓ ${data.deleted} log${data.deleted !== 1 ? "s" : ""} verwijderd.`;
+        document.getElementById("admin-logs-display").innerHTML = "";
+      } catch (e) {
+        statusEl.textContent = `Fout: ${e.message}`;
+      }
+    });
+
+    function escHtml(str) {
+      return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
     </script>
   </body>
 </html>
