@@ -148,6 +148,7 @@
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
               <button class="ts-btn secondary ts-btn-sm" id="admin-logs-fetch-btn">📥 LOG's ophalen</button>
               <button class="ts-btn danger ts-btn-sm" id="admin-logs-reset-btn">🗑️ LOG's resetten</button>
+              <button class="ts-btn secondary ts-btn-sm" id="admin-logs-debug-btn" style="opacity:0.6;font-size:0.8rem;">🔧 Debug</button>
             </div>
             <div id="admin-logs-status" style="font-size:0.85rem;color:var(--muted);margin-bottom:8px;min-height:1.2em;"></div>
             <div id="admin-logs-display" style="font-size:0.82rem;max-height:420px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;padding:0 10px;"></div>
@@ -655,6 +656,19 @@
         document.getElementById("admin-logs-display").innerHTML = "";
       } catch (e) {
         statusEl.textContent = `Fout: ${e.message}`;
+      }
+    });
+
+    // ── Debug LOGS KV ────────────────────────────────────────────────────────
+    document.getElementById("admin-logs-debug-btn").addEventListener("click", async () => {
+      const statusEl = document.getElementById("admin-logs-status");
+      statusEl.textContent = "Debug bezig...";
+      try {
+        const res  = await fetch(`${TS_API}/admin/logs-debug`, { method: "POST", headers: { "X-Admin-Password": adminPassword } });
+        const data = await res.json();
+        statusEl.innerHTML = `<pre style="font-size:0.78rem;white-space:pre-wrap">${JSON.stringify(data, null, 2)}</pre>`;
+      } catch (e) {
+        statusEl.textContent = `Debug fout: ${e.message}`;
       }
     });
 
