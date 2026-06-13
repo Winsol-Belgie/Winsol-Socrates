@@ -295,7 +295,7 @@ button:disabled { opacity:.6; cursor:not-allowed; }
 .ts-step-field:last-of-type { margin-bottom: 24px; }
 .ts-step-label  { font-weight: 700; display: block; margin-bottom: 4px; }
 .ts-step-images { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
-.ts-step-img    { max-width: 100%; width: auto; max-height: 260px; border-radius: 8px; border: 1px solid var(--border); object-fit: contain; cursor: pointer; }
+.ts-step-img    { width: 400px; height: 400px; max-width: 100%; border-radius: 8px; border: 1px solid var(--border); object-fit: contain; cursor: pointer; }
 .ts-step-link   { font-size: 0.9rem; margin-bottom: 18px; }
 .ts-step-link a { color: #111; font-weight: 600; text-decoration: underline; }
 .ts-step-link a:hover { color: #555; }
