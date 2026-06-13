@@ -12,7 +12,7 @@
 
       <!-- HERO -->
       <header class="hero" role="banner" aria-label="Winsol SO!Crates header">
-        <h1 class="hero__title">Winsol SO!Crates (13-06-'26 v6)</h1>
+        <h1 class="hero__title">Winsol SO!Crates (13-06-'26 v7)</h1>
         <img class="hero__logo" src="SO-Crates_Logo_mini.png" alt="SO!Crates logo" />
       </header>
 
@@ -125,6 +125,7 @@
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
               <button class="ts-btn secondary ts-btn-sm" id="admin-parse-btn" disabled>Verwerk Excel</button>
               <button class="ts-btn primary ts-btn-sm" id="admin-matrix-upload-btn" disabled>Uploaden naar KV</button>
+              <button class="ts-btn secondary ts-btn-sm" id="admin-translate-btn">🌐 Vertalen</button>
             </div>
             <div id="admin-matrix-preview" style="font-size:0.88rem;color:var(--muted);margin-top:10px;min-height:1.2em;"></div>
             <div id="admin-matrix-status" style="font-size:0.88rem;margin-top:6px;min-height:1.2em;"></div>
@@ -561,6 +562,30 @@
         }
       } catch (err) {
         statusEl.innerHTML = `<span style="color:#c53030">Fout: ${err.message}</span>`;
+      }
+    });
+
+    document.getElementById("admin-translate-btn").addEventListener("click", async () => {
+      const statusEl = document.getElementById("admin-matrix-status");
+      const btn = document.getElementById("admin-translate-btn");
+      btn.disabled = true;
+      statusEl.innerHTML = `<span style="color:#888">🌐 Vertalingen worden gegenereerd… (kan 30-60s duren)</span>`;
+      try {
+        const res = await fetch(`${TS_API}/admin/translate-all`, {
+          method: "POST",
+          headers: { "X-Admin-Password": adminPassword },
+        });
+        const d = await res.json();
+        if (res.ok) {
+          const failInfo = d.failed && d.failed.length ? ` · ${d.failed.length} mislukt` : "";
+          statusEl.innerHTML = `<span style="color:green">✓ ${d.translated}/${d.total} vertalingen gecached${failInfo}</span>`;
+        } else {
+          statusEl.innerHTML = `<span style="color:#c53030">Fout: ${d.error}</span>`;
+        }
+      } catch (err) {
+        statusEl.innerHTML = `<span style="color:#c53030">Fout: ${err.message}</span>`;
+      } finally {
+        btn.disabled = false;
       }
     });
 
