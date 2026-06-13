@@ -49,6 +49,7 @@
       <div class="tabs">
         <button class="tab-btn active" data-tab="chat">Chat</button>
         <button class="tab-btn" id="tab-btn-troubleshoot" data-tab="troubleshoot">Probleemoplossing</button>
+        <button class="tab-btn" id="tab-btn-handleiding" data-tab="handleiding">Handleiding</button>
         <button class="tab-btn" data-tab="admin">Admin</button>
       </div>
 
@@ -76,6 +77,23 @@
         </div>
         <div id="ts-app">
           <div class="ts-loading" id="ts-placeholder">Kies een component om te starten.</div>
+        </div>
+      </div>
+
+      <!-- TAB: HANDLEIDING -->
+      <div id="tab-handleiding" class="tab-panel">
+        <div class="ts-toolbar">
+          <div class="language-wrapper">
+            <select id="man-component">
+              <option value="">— Kies component —</option>
+              <option value="screen">Screen</option>
+              <option value="led">LED</option>
+              <option value="lamel">Lamel</option>
+            </select>
+          </div>
+        </div>
+        <div id="man-app">
+          <div class="ts-loading" id="man-placeholder">Kies een component om te starten.</div>
         </div>
       </div>
 
@@ -119,6 +137,31 @@
             </div>
             <div id="admin-matrix-preview" style="font-size:0.88rem;color:var(--muted);margin-top:10px;min-height:1.2em;"></div>
             <div id="admin-matrix-status" style="font-size:0.88rem;margin-top:6px;min-height:1.2em;"></div>
+          </div>
+
+          <!-- Handleiding sectie -->
+          <div class="ts-card" style="margin-bottom:12px;">
+            <h2>📖 Handleiding updaten</h2>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;">
+              <div class="language-wrapper">
+                <select id="admin-man-component">
+                  <option value="screen">Screen</option>
+                  <option value="led">LED</option>
+                  <option value="lamel">Lamel</option>
+                </select>
+              </div>
+              <label class="ts-btn secondary ts-btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+                📂 Kies Excel-bestand
+                <input type="file" id="admin-man-excel-file" accept=".xlsx" style="display:none;">
+              </label>
+            </div>
+            <div id="admin-man-excel-name" style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;min-height:1.2em;"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="ts-btn secondary ts-btn-sm" id="admin-man-parse-btn" disabled>Verwerk Excel</button>
+              <button class="ts-btn primary ts-btn-sm" id="admin-man-upload-btn" disabled>Uploaden naar KV</button>
+            </div>
+            <div id="admin-man-preview" style="font-size:0.88rem;color:var(--muted);margin-top:10px;min-height:1.2em;"></div>
+            <div id="admin-man-status" style="font-size:0.88rem;margin-top:6px;min-height:1.2em;"></div>
           </div>
 
           <!-- PNG sectie -->
@@ -382,6 +425,7 @@
     // ── Admin tab ────────────────────────────────────────────────────────────
     let adminPassword = null;
     let adminParsedMatrix = null;
+    let adminParsedManual = null;
     let adminPngFiles = [];
 
     // Login
@@ -525,6 +569,117 @@
       }
     });
 
+    // ── Admin: handleiding ────────────────────────────────────────────────────
+    document.getElementById("admin-man-excel-file").addEventListener("change", function () {
+      const f = this.files[0];
+      if (f) {
+        document.getElementById("admin-man-excel-name").textContent = f.name;
+        document.getElementById("admin-man-parse-btn").disabled = false;
+        document.getElementById("admin-man-upload-btn").disabled = true;
+        document.getElementById("admin-man-preview").textContent = "";
+        document.getElementById("admin-man-status").textContent = "";
+        adminParsedManual = null;
+      }
+    });
+
+    document.getElementById("admin-man-parse-btn").addEventListener("click", async () => {
+      const file = document.getElementById("admin-man-excel-file").files[0];
+      const component = document.getElementById("admin-man-component").value;
+      if (!file) return;
+      const preview = document.getElementById("admin-man-preview");
+      preview.textContent = "Bezig met verwerken…";
+      document.getElementById("admin-man-upload-btn").disabled = true;
+      try {
+        const data = await file.arrayBuffer();
+        const workbook = XLSX.read(data, { type: "array" });
+        const ws = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
+        const manual = adminParseManualExcel(rows, component);
+
+        // Auto-koppel PNG's op basis van stapcode-naamconventie
+        try {
+          const pngRes = await fetch(`${TS_API}/admin/png-list`, { headers: { "X-Admin-Password": adminPassword } });
+          if (pngRes.ok) {
+            const { files } = await pngRes.json();
+            for (const code of Object.keys(manual.stappen)) {
+              const matching = files
+                .filter(f => f.toLowerCase().startsWith(code.toLowerCase() + "-") ||
+                             f.toLowerCase().startsWith(code.toLowerCase() + "."))
+                .sort();
+              if (matching.length) manual.stappen[code].images = matching;
+            }
+          }
+        } catch { /* niet-kritiek */ }
+
+        adminParsedManual = manual;
+        const nM = Object.keys(manual.manuals).length;
+        const nS = Object.keys(manual.stappen).length;
+        const nL = Object.values(manual.stappen).filter(s => s.link).length;
+        preview.textContent = `✓ ${nM} handleidingen · ${nS} stappen · ${nL} links`;
+        document.getElementById("admin-man-upload-btn").disabled = false;
+      } catch (err) {
+        preview.textContent = `Fout bij verwerken: ${err.message}`;
+      }
+    });
+
+    document.getElementById("admin-man-upload-btn").addEventListener("click", async () => {
+      if (!adminParsedManual) return;
+      const statusEl = document.getElementById("admin-man-status");
+      statusEl.textContent = "Bezig met uploaden…";
+      try {
+        const res = await fetch(`${TS_API}/admin/manual`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Admin-Password": adminPassword },
+          body: JSON.stringify(adminParsedManual),
+        });
+        const d = await res.json();
+        if (res.ok) {
+          statusEl.innerHTML = `<span style="color:green">✓ ${d.key} bijgewerkt (${d.manuals} handleidingen, ${d.stappen} stappen)</span>`;
+        } else {
+          statusEl.innerHTML = `<span style="color:#c53030">Fout: ${d.error}</span>`;
+        }
+      } catch (err) {
+        statusEl.innerHTML = `<span style="color:#c53030">Fout: ${err.message}</span>`;
+      }
+    });
+
+    function adminParseManualExcel(rows, componentName) {
+      const headerRow = rows[0] || [];
+      const dataRows  = rows.slice(1);
+      // Detecteer aansturing-kolommen uit de header (kolommen H-N = index 7-13)
+      const aansturingCols = {};
+      for (let i = 7; i <= 13; i++) {
+        const v = String(headerRow[i] || "").trim();
+        if (v) aansturingCols[i] = v;
+      }
+      const required_info = [], manuals = {}, stappen = {};
+      const seenRI = new Set();
+      for (const row of dataRows) {
+        const a = String(row[0] || "").trim();
+        const b = String(row[1] || "").trim();
+        if (a && b && a.startsWith("MS") && !seenRI.has(a)) {
+          seenRI.add(a);
+          required_info.push({ id: a, vraag: b, opties: String(row[2] || "").split(",").map(s => s.trim()).filter(Boolean) });
+        }
+        const d = String(row[3] || "").trim();
+        const e = String(row[4] || "").trim();
+        if (d && e && !manuals[d]) {
+          manuals[d] = { naam: e, stappen: String(row[5] || "").split(",").map(s => s.trim()).filter(Boolean) };
+        }
+        const g = String(row[6] || "").trim();
+        const o = String(row[14] || "").trim();  // kolom O
+        if (g && o && !stappen[g]) {
+          const aansturing = {};
+          for (const [ci, name] of Object.entries(aansturingCols)) {
+            aansturing[name] = String(row[Number(ci)] || "").trim().toLowerCase() === "ja";
+          }
+          const link = String(row[16] || "").trim(); // kolom Q
+          stappen[g] = { titel: o, uitleg: String(row[15] || "").trim(), link: link || null, images: [], aansturing };
+        }
+      }
+      return { component: componentName.toLowerCase(), required_info, manuals, stappen };
+    }
+
     // PNG bestanden kiezen
     document.getElementById("admin-png-files").addEventListener("change", function () {
       adminPngFiles = Array.from(this.files);
@@ -572,12 +727,19 @@
     // ── Reset knop: ook troubleshoot en admin resetten ───────────────────────
     document.getElementById("resetBtn").addEventListener("click", () => {
       const tsActive    = document.getElementById("tab-troubleshoot").classList.contains("active");
+      const manActive   = document.getElementById("tab-handleiding").classList.contains("active");
       const adminActive = document.getElementById("tab-admin").classList.contains("active");
 
       if (tsActive) {
         tsMatrix = null; tsControl = null; tsComplaint = null; tsCauses = []; tsStep = 0;
         document.getElementById("ts-component").value = "";
         tsRender(`<div class="ts-loading">${tsT().start}</div>`);
+      }
+
+      if (manActive) {
+        manManual = null; manControl = null; manCurrentManual = null; manCurrentSteps = []; manStep = 0;
+        document.getElementById("man-component").value = "";
+        manRender(`<div class="ts-loading">${manT().start}</div>`);
       }
 
       if (adminActive) {
@@ -606,6 +768,15 @@
         document.getElementById("admin-png-upload-btn").disabled      = true;
         document.getElementById("admin-png-upload-btn").textContent   = "Uploaden";
         document.getElementById("admin-png-files").value              = "";
+
+        // Handleiding-sectie wissen
+        adminParsedManual = null;
+        document.getElementById("admin-man-excel-name").textContent  = "";
+        document.getElementById("admin-man-preview").textContent     = "";
+        document.getElementById("admin-man-status").textContent      = "";
+        document.getElementById("admin-man-parse-btn").disabled      = true;
+        document.getElementById("admin-man-upload-btn").disabled     = true;
+        document.getElementById("admin-man-excel-file").value        = "";
 
         // Logs-sectie wissen
         document.getElementById("admin-logs-status").textContent  = "";
@@ -670,6 +841,192 @@
       } catch (e) {
         statusEl.textContent = `Debug fout: ${e.message}`;
       }
+    });
+
+    // ── Handleiding tab ───────────────────────────────────────────────────────
+    const manLabels = {
+      nl: { loading:"Handleiding laden…", chooseControl:"Type aansturing?", chooseManual:"Kies een handleiding",
+            stepOf:(n,t)=>`Stap ${n} van ${t}`, btnPrev:"← Vorige", btnNext:"Volgende →",
+            btnFinish:"✓ Klaar", btnBack:"← Terug",
+            noManual:"Handleiding niet beschikbaar voor dit component.",
+            start:"Kies een component om te starten.", tabHandleiding:"Handleiding",
+            chooseComponent:"— Kies component —", compScreen:"Screen", compLed:"LED", compLamel:"Lamel",
+            linkText:"Zie link voor meer uitleg", doneTitle:"Einde handleiding", restart:"Opnieuw starten" },
+      fr: { loading:"Chargement du manuel…", chooseControl:"Type de commande ?", chooseManual:"Choisissez un manuel",
+            stepOf:(n,t)=>`Étape ${n} sur ${t}`, btnPrev:"← Précédent", btnNext:"Suivant →",
+            btnFinish:"✓ Terminé", btnBack:"← Retour",
+            noManual:"Manuel non disponible pour ce composant.",
+            start:"Choisissez un composant.", tabHandleiding:"Manuel",
+            chooseComponent:"— Choisir le composant —", compScreen:"Screen", compLed:"LED", compLamel:"Lame",
+            linkText:"Voir le lien pour plus d'informations", doneTitle:"Fin du manuel", restart:"Recommencer" },
+      en: { loading:"Loading manual…", chooseControl:"Control type?", chooseManual:"Choose a manual",
+            stepOf:(n,t)=>`Step ${n} of ${t}`, btnPrev:"← Previous", btnNext:"Next →",
+            btnFinish:"✓ Done", btnBack:"← Back",
+            noManual:"Manual not available for this component.",
+            start:"Choose a component.", tabHandleiding:"Manual",
+            chooseComponent:"— Choose component —", compScreen:"Screen", compLed:"LED", compLamel:"Louvre",
+            linkText:"See link for more information", doneTitle:"End of manual", restart:"Start over" },
+      de: { loading:"Handbuch laden…", chooseControl:"Steuerungstyp?", chooseManual:"Wählen Sie ein Handbuch",
+            stepOf:(n,t)=>`Schritt ${n} von ${t}`, btnPrev:"← Zurück", btnNext:"Weiter →",
+            btnFinish:"✓ Fertig", btnBack:"← Zurück",
+            noManual:"Handbuch nicht verfügbar.", start:"Komponente wählen.", tabHandleiding:"Handbuch",
+            chooseComponent:"— Komponente wählen —", compScreen:"Screen", compLed:"LED", compLamel:"Lamelle",
+            linkText:"Siehe Link für weitere Informationen", doneTitle:"Ende des Handbuchs", restart:"Neu starten" },
+      es: { loading:"Cargando manual…", chooseControl:"¿Tipo de control?", chooseManual:"Elija un manual",
+            stepOf:(n,t)=>`Paso ${n} de ${t}`, btnPrev:"← Anterior", btnNext:"Siguiente →",
+            btnFinish:"✓ Listo", btnBack:"← Volver",
+            noManual:"Manual no disponible.", start:"Elija un componente.", tabHandleiding:"Manual",
+            chooseComponent:"— Elegir componente —", compScreen:"Screen", compLed:"LED", compLamel:"Lama",
+            linkText:"Ver enlace para más información", doneTitle:"Fin del manual", restart:"Reiniciar" },
+      it: { loading:"Caricamento manuale…", chooseControl:"Tipo di controllo?", chooseManual:"Scegliere un manuale",
+            stepOf:(n,t)=>`Passo ${n} di ${t}`, btnPrev:"← Precedente", btnNext:"Successivo →",
+            btnFinish:"✓ Fatto", btnBack:"← Indietro",
+            noManual:"Manuale non disponibile.", start:"Scegliere un componente.", tabHandleiding:"Manuale",
+            chooseComponent:"— Scegliere componente —", compScreen:"Screen", compLed:"LED", compLamel:"Lamella",
+            linkText:"Vedi link per ulteriori informazioni", doneTitle:"Fine del manuale", restart:"Ricominciare" },
+    };
+
+    function manT() {
+      const l = (document.getElementById("language").value || "auto");
+      const code = l === "auto" ? (navigator.language || "nl").slice(0,2) : l;
+      return manLabels[code] || manLabels.nl;
+    }
+
+    let manManual = null, manControl = null, manCurrentManual = null, manCurrentSteps = [], manStep = 0;
+    const manApp = () => document.getElementById("man-app");
+    function manRender(html) { manApp().innerHTML = html; }
+    function manCard(title, body) { return `<div class="ts-card"><h2>${title}</h2>${body}</div>`; }
+
+    function manGetApplicableManuals() {
+      if (!manManual || !manControl) return [];
+      return Object.entries(manManual.manuals)
+        .filter(([, m]) => m.stappen.some(id => {
+          const s = manManual.stappen[id];
+          return s && s.aansturing && s.aansturing[manControl];
+        }))
+        .map(([id, m]) => ({ id, naam: m.naam, stappen: m.stappen }));
+    }
+
+    function manShowControl() {
+      const ri = manManual.required_info[0];
+      if (!ri) { manShowManuals(); return; }
+      const btns = ri.opties.map((opt, i) => `<button class="ts-btn" data-idx="${i}">${opt}</button>`).join("");
+      manRender(manCard(ri.vraag, `<div class="ts-btn-list">${btns}</div>`));
+      manApp().querySelectorAll(".ts-btn").forEach((btn, i) => {
+        btn.addEventListener("click", () => { manControl = ri.opties[i]; manShowManuals(); });
+      });
+    }
+
+    function manShowManuals() {
+      const list = manGetApplicableManuals();
+      let btns = list.map((m, i) => `<button class="ts-btn" data-idx="${i}">${m.naam}</button>`).join("");
+      if (!btns) btns = `<div class="ts-loading">${manT().noManual}</div>`;
+      manRender(manCard(manT().chooseManual, `<div class="ts-btn-list">${btns}</div>`));
+      manApp().querySelectorAll(".ts-btn").forEach((btn, i) => {
+        btn.addEventListener("click", () => {
+          manCurrentManual = list[i];
+          manCurrentSteps = manCurrentManual.stappen.filter(id => {
+            const s = manManual.stappen[id];
+            return s && s.aansturing && s.aansturing[manControl];
+          });
+          manStep = 0;
+          manShowStep();
+        });
+      });
+    }
+
+    function manShowStep() {
+      if (manStep >= manCurrentSteps.length) { manShowDone(); return; }
+      const stepId = manCurrentSteps[manStep];
+      const step   = manManual.stappen[stepId];
+      const n = manStep + 1, total = manCurrentSteps.length;
+      const isLast = manStep === total - 1;
+      const linkHtml = step.link
+        ? `<div class="ts-step-link"><a href="${step.link}" target="_blank" rel="noopener noreferrer">${manT().linkText}</a></div>` : "";
+      const imagesHtml = (step.images && step.images.length)
+        ? `<div class="ts-step-images">${step.images.map(f => `<img src="${TS_API}/png/${encodeURIComponent(f)}" alt="${f}" class="ts-step-img" loading="lazy" />`).join("")}</div>` : "";
+      manRender(`<div class="ts-card">
+        <div class="ts-step-header">
+          <div class="ts-step-badge">${manT().stepOf(n, total)}</div>
+          <div class="ts-action-row">
+            <button class="ts-btn secondary ts-btn-sm" id="man-back">${manT().btnBack}</button>
+            <button class="ts-btn secondary ts-btn-sm" id="man-prev" style="${manStep === 0 ? "visibility:hidden" : ""}">${manT().btnPrev}</button>
+            ${isLast
+              ? `<button class="ts-btn primary ts-btn-sm" id="man-finish">${manT().btnFinish}</button>`
+              : `<button class="ts-btn primary ts-btn-sm" id="man-next">${manT().btnNext}</button>`}
+          </div>
+        </div>
+        <div class="ts-complaint-label">${manCurrentManual.naam}</div>
+        <div class="ts-step-field"><strong>${step.titel}</strong></div>
+        ${step.uitleg ? `<div class="ts-step-field">${step.uitleg}</div>` : ""}
+        ${imagesHtml}${linkHtml}
+      </div>`);
+      document.getElementById("man-back").addEventListener("click", manShowManuals);
+      const prevEl = document.getElementById("man-prev");
+      if (prevEl) prevEl.addEventListener("click", () => { if (manStep > 0) { manStep--; manShowStep(); } });
+      const nextEl = document.getElementById("man-next");
+      if (nextEl) nextEl.addEventListener("click", () => { manStep++; manShowStep(); });
+      const finEl  = document.getElementById("man-finish");
+      if (finEl)  finEl.addEventListener("click", manShowDone);
+    }
+
+    function manShowDone() {
+      manRender(`<div class="ts-card ts-done">
+        <h2>${manT().doneTitle}</h2>
+        <button class="ts-btn primary" id="man-restart">${manT().restart}</button>
+      </div>`);
+      document.getElementById("man-restart").addEventListener("click", manReset);
+    }
+
+    function manReset() {
+      manControl = null; manCurrentManual = null; manCurrentSteps = []; manStep = 0;
+      if (manManual) manShowControl();
+    }
+
+    async function manLoad() {
+      const component = document.getElementById("man-component").value;
+      const lang = (document.getElementById("language").value || "auto");
+      const langCode = lang === "auto" ? (navigator.language || "nl").slice(0,2) : lang;
+      if (!component) { manRender(`<div class="ts-loading">${manT().start}</div>`); return; }
+      manRender(`<div class="ts-loading">${manT().loading}</div>`);
+      try {
+        const res = await fetch(`${TS_API}/manual?component=${component}&language=${langCode}`);
+        if (!res.ok) throw new Error(res.status);
+        manManual = await res.json();
+        manControl = null; manCurrentManual = null; manCurrentSteps = []; manStep = 0;
+        manShowControl();
+      } catch {
+        manRender(`<div class="ts-card"><div class="ts-error">${manT().noManual}</div></div>`);
+      }
+    }
+
+    function manUpdateTabLabel() {
+      document.getElementById("tab-btn-handleiding").textContent = manT().tabHandleiding;
+    }
+
+    function manUpdateComponentLabels() {
+      const t = manT(), sel = document.getElementById("man-component");
+      sel.options[0].text = t.chooseComponent;
+      sel.options[1].text = t.compScreen;
+      sel.options[2].text = t.compLed;
+      sel.options[3].text = t.compLamel;
+    }
+
+    manUpdateTabLabel();
+    manUpdateComponentLabels();
+
+    (function() {
+      const sel = document.getElementById("man-component");
+      let _prev = "";
+      sel.addEventListener("mousedown", function() { _prev = this.value; this.value = ""; });
+      sel.addEventListener("change",    function() { _prev = ""; manLoad(); });
+      sel.addEventListener("blur",      function() { if (!this.value && _prev) this.value = _prev; _prev = ""; });
+    })();
+
+    document.getElementById("language").addEventListener("change", () => {
+      manUpdateTabLabel();
+      manUpdateComponentLabels();
+      if (document.getElementById("man-component").value) manLoad();
     });
 
     function escHtml(str) {
