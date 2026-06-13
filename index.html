@@ -12,7 +12,7 @@
 
       <!-- HERO -->
       <header class="hero" role="banner" aria-label="Winsol SO!Crates header">
-        <h1 class="hero__title">Winsol SO!Crates (13-06-'26 V1)</h1>
+        <h1 class="hero__title">Winsol SO!Crates (13-06-'26 v2)</h1>
         <img class="hero__logo" src="SO-Crates_Logo_mini.png" alt="SO!Crates logo" />
       </header>
 
@@ -82,18 +82,8 @@
 
       <!-- TAB: HANDLEIDING -->
       <div id="tab-handleiding" class="tab-panel">
-        <div class="ts-toolbar">
-          <div class="language-wrapper">
-            <select id="man-component">
-              <option value="">— Kies component —</option>
-              <option value="screen">Screen</option>
-              <option value="led">LED</option>
-              <option value="lamel">Lamel</option>
-            </select>
-          </div>
-        </div>
         <div id="man-app">
-          <div class="ts-loading" id="man-placeholder">Kies een component om te starten.</div>
+          <div class="ts-loading">Handleiding laden…</div>
         </div>
       </div>
 
@@ -737,9 +727,10 @@
       }
 
       if (manActive) {
-        manManual = null; manControl = null; manCurrentManual = null; manCurrentSteps = []; manStep = 0;
-        document.getElementById("man-component").value = "";
-        manRender(`<div class="ts-loading">${manT().start}</div>`);
+        manMergedData = null; manLoaded = false;
+        manControl = null; manCurrentManual = null; manCurrentSteps = []; manStep = 0;
+        manLoad();
+        manLoaded = true;
       }
 
       if (adminActive) {
@@ -845,44 +836,36 @@
 
     // ── Handleiding tab ───────────────────────────────────────────────────────
     const manLabels = {
-      nl: { loading:"Handleiding laden…", chooseControl:"Type aansturing?", chooseManual:"Kies een handleiding",
+      nl: { loading:"Handleiding laden…", chooseManual:"Kies een handleiding",
             stepOf:(n,t)=>`Stap ${n} van ${t}`, btnPrev:"← Vorige", btnNext:"Volgende →",
             btnFinish:"✓ Klaar", btnBack:"← Terug",
-            noManual:"Handleiding niet beschikbaar voor dit component.",
-            start:"Kies een component om te starten.", tabHandleiding:"Handleiding",
-            chooseComponent:"— Kies component —", compScreen:"Screen", compLed:"LED", compLamel:"Lamel",
+            noManual:"Geen handleidingen beschikbaar.",
+            tabHandleiding:"Handleiding",
             linkText:"Zie link voor meer uitleg", doneTitle:"Einde handleiding", restart:"Opnieuw starten" },
-      fr: { loading:"Chargement du manuel…", chooseControl:"Type de commande ?", chooseManual:"Choisissez un manuel",
+      fr: { loading:"Chargement du manuel…", chooseManual:"Choisissez un manuel",
             stepOf:(n,t)=>`Étape ${n} sur ${t}`, btnPrev:"← Précédent", btnNext:"Suivant →",
             btnFinish:"✓ Terminé", btnBack:"← Retour",
-            noManual:"Manuel non disponible pour ce composant.",
-            start:"Choisissez un composant.", tabHandleiding:"Manuel",
-            chooseComponent:"— Choisir le composant —", compScreen:"Screen", compLed:"LED", compLamel:"Lame",
+            noManual:"Aucun manuel disponible.", tabHandleiding:"Manuel",
             linkText:"Voir le lien pour plus d'informations", doneTitle:"Fin du manuel", restart:"Recommencer" },
-      en: { loading:"Loading manual…", chooseControl:"Control type?", chooseManual:"Choose a manual",
+      en: { loading:"Loading manual…", chooseManual:"Choose a manual",
             stepOf:(n,t)=>`Step ${n} of ${t}`, btnPrev:"← Previous", btnNext:"Next →",
             btnFinish:"✓ Done", btnBack:"← Back",
-            noManual:"Manual not available for this component.",
-            start:"Choose a component.", tabHandleiding:"Manual",
-            chooseComponent:"— Choose component —", compScreen:"Screen", compLed:"LED", compLamel:"Louvre",
+            noManual:"No manuals available.", tabHandleiding:"Manual",
             linkText:"See link for more information", doneTitle:"End of manual", restart:"Start over" },
-      de: { loading:"Handbuch laden…", chooseControl:"Steuerungstyp?", chooseManual:"Wählen Sie ein Handbuch",
+      de: { loading:"Handbuch laden…", chooseManual:"Wählen Sie ein Handbuch",
             stepOf:(n,t)=>`Schritt ${n} von ${t}`, btnPrev:"← Zurück", btnNext:"Weiter →",
             btnFinish:"✓ Fertig", btnBack:"← Zurück",
-            noManual:"Handbuch nicht verfügbar.", start:"Komponente wählen.", tabHandleiding:"Handbuch",
-            chooseComponent:"— Komponente wählen —", compScreen:"Screen", compLed:"LED", compLamel:"Lamelle",
+            noManual:"Keine Handbücher verfügbar.", tabHandleiding:"Handbuch",
             linkText:"Siehe Link für weitere Informationen", doneTitle:"Ende des Handbuchs", restart:"Neu starten" },
-      es: { loading:"Cargando manual…", chooseControl:"¿Tipo de control?", chooseManual:"Elija un manual",
+      es: { loading:"Cargando manual…", chooseManual:"Elija un manual",
             stepOf:(n,t)=>`Paso ${n} de ${t}`, btnPrev:"← Anterior", btnNext:"Siguiente →",
             btnFinish:"✓ Listo", btnBack:"← Volver",
-            noManual:"Manual no disponible.", start:"Elija un componente.", tabHandleiding:"Manual",
-            chooseComponent:"— Elegir componente —", compScreen:"Screen", compLed:"LED", compLamel:"Lama",
+            noManual:"No hay manuales disponibles.", tabHandleiding:"Manual",
             linkText:"Ver enlace para más información", doneTitle:"Fin del manual", restart:"Reiniciar" },
-      it: { loading:"Caricamento manuale…", chooseControl:"Tipo di controllo?", chooseManual:"Scegliere un manuale",
+      it: { loading:"Caricamento manuale…", chooseManual:"Scegliere un manuale",
             stepOf:(n,t)=>`Passo ${n} di ${t}`, btnPrev:"← Precedente", btnNext:"Successivo →",
             btnFinish:"✓ Fatto", btnBack:"← Indietro",
-            noManual:"Manuale non disponibile.", start:"Scegliere un componente.", tabHandleiding:"Manuale",
-            chooseComponent:"— Scegliere componente —", compScreen:"Screen", compLed:"LED", compLamel:"Lamella",
+            noManual:"Nessun manuale disponibile.", tabHandleiding:"Manuale",
             linkText:"Vedi link per ulteriori informazioni", doneTitle:"Fine del manuale", restart:"Ricominciare" },
     };
 
@@ -892,33 +875,33 @@
       return manLabels[code] || manLabels.nl;
     }
 
-    let manManual = null, manControl = null, manCurrentManual = null, manCurrentSteps = [], manStep = 0;
+    // Merged state: alle componenten samengevat
+    let manMergedData = null;   // { options:[], manuals:[{id,naam,stappen,source}], sources:[] }
+    let manControl = null, manCurrentManual = null, manCurrentSteps = [], manStep = 0;
     const manApp = () => document.getElementById("man-app");
     function manRender(html) { manApp().innerHTML = html; }
     function manCard(title, body) { return `<div class="ts-card"><h2>${title}</h2>${body}</div>`; }
 
-    function manGetApplicableManuals() {
-      if (!manManual || !manControl) return [];
-      return Object.entries(manManual.manuals)
-        .filter(([, m]) => m.stappen.some(id => {
-          const s = manManual.stappen[id];
-          return s && s.aansturing && s.aansturing[manControl];
-        }))
-        .map(([id, m]) => ({ id, naam: m.naam, stappen: m.stappen }));
-    }
-
     function manShowControl() {
-      const ri = manManual.required_info[0];
-      if (!ri) { manShowManuals(); return; }
-      const btns = ri.opties.map((opt, i) => `<button class="ts-btn" data-idx="${i}">${opt}</button>`).join("");
-      manRender(manCard(ri.vraag, `<div class="ts-btn-list">${btns}</div>`));
+      if (!manMergedData || !manMergedData.options.length) {
+        manRender(`<div class="ts-card"><div class="ts-error">${manT().noManual}</div></div>`); return;
+      }
+      // Vraag ophalen uit de eerste beschikbare bron
+      const vraag = manMergedData.sources[0]?.required_info?.[0]?.vraag || "Type aansturing";
+      const btns = manMergedData.options.map((opt, i) => `<button class="ts-btn" data-idx="${i}">${opt}</button>`).join("");
+      manRender(manCard(vraag, `<div class="ts-btn-list">${btns}</div>`));
       manApp().querySelectorAll(".ts-btn").forEach((btn, i) => {
-        btn.addEventListener("click", () => { manControl = ri.opties[i]; manShowManuals(); });
+        btn.addEventListener("click", () => { manControl = manMergedData.options[i]; manShowManuals(); });
       });
     }
 
     function manShowManuals() {
-      const list = manGetApplicableManuals();
+      const list = manMergedData.manuals.filter(m =>
+        m.stappen.some(id => {
+          const s = m.source.stappen[id];
+          return s && s.aansturing && s.aansturing[manControl];
+        })
+      );
       let btns = list.map((m, i) => `<button class="ts-btn" data-idx="${i}">${m.naam}</button>`).join("");
       if (!btns) btns = `<div class="ts-loading">${manT().noManual}</div>`;
       manRender(manCard(manT().chooseManual, `<div class="ts-btn-list">${btns}</div>`));
@@ -926,7 +909,7 @@
         btn.addEventListener("click", () => {
           manCurrentManual = list[i];
           manCurrentSteps = manCurrentManual.stappen.filter(id => {
-            const s = manManual.stappen[id];
+            const s = manCurrentManual.source.stappen[id];
             return s && s.aansturing && s.aansturing[manControl];
           });
           manStep = 0;
@@ -938,7 +921,7 @@
     function manShowStep() {
       if (manStep >= manCurrentSteps.length) { manShowDone(); return; }
       const stepId = manCurrentSteps[manStep];
-      const step   = manManual.stappen[stepId];
+      const step   = manCurrentManual.source.stappen[stepId];
       const n = manStep + 1, total = manCurrentSteps.length;
       const isLast = manStep === total - 1;
       const linkHtml = step.link
@@ -980,53 +963,62 @@
 
     function manReset() {
       manControl = null; manCurrentManual = null; manCurrentSteps = []; manStep = 0;
-      if (manManual) manShowControl();
+      if (manMergedData) manShowControl();
     }
 
     async function manLoad() {
-      const component = document.getElementById("man-component").value;
       const lang = (document.getElementById("language").value || "auto");
       const langCode = lang === "auto" ? (navigator.language || "nl").slice(0,2) : lang;
-      if (!component) { manRender(`<div class="ts-loading">${manT().start}</div>`); return; }
       manRender(`<div class="ts-loading">${manT().loading}</div>`);
-      try {
-        const res = await fetch(`${TS_API}/manual?component=${component}&language=${langCode}`);
-        if (!res.ok) throw new Error(res.status);
-        manManual = await res.json();
-        manControl = null; manCurrentManual = null; manCurrentSteps = []; manStep = 0;
-        manShowControl();
-      } catch {
-        manRender(`<div class="ts-card"><div class="ts-error">${manT().noManual}</div></div>`);
+
+      // Laad alle componenten parallel, negeer 404's
+      const components = ["screen", "lamel", "led"];
+      const results = await Promise.allSettled(
+        components.map(c => fetch(`${TS_API}/manual?component=${c}&language=${langCode}`)
+          .then(r => r.ok ? r.json() : null))
+      );
+      const sources = results
+        .map(r => r.status === "fulfilled" ? r.value : null)
+        .filter(Boolean);
+
+      if (!sources.length) {
+        manRender(`<div class="ts-card"><div class="ts-error">${manT().noManual}</div></div>`); return;
       }
+
+      // Samenvoegen: unieke aansturing-opties + alle handleidingen over alle componenten
+      const optionSet = new Set();
+      const allManuals = [];
+      for (const src of sources) {
+        for (const ri of src.required_info || []) {
+          for (const opt of ri.opties || []) optionSet.add(opt);
+        }
+        for (const [id, m] of Object.entries(src.manuals || {})) {
+          if (m.naam && m.stappen && m.stappen.length) {
+            allManuals.push({ id, naam: m.naam, stappen: m.stappen, source: src });
+          }
+        }
+      }
+
+      manMergedData = { options: Array.from(optionSet), manuals: allManuals, sources };
+      manControl = null; manCurrentManual = null; manCurrentSteps = []; manStep = 0;
+      manShowControl();
     }
 
     function manUpdateTabLabel() {
       document.getElementById("tab-btn-handleiding").textContent = manT().tabHandleiding;
     }
 
-    function manUpdateComponentLabels() {
-      const t = manT(), sel = document.getElementById("man-component");
-      sel.options[0].text = t.chooseComponent;
-      sel.options[1].text = t.compScreen;
-      sel.options[2].text = t.compLed;
-      sel.options[3].text = t.compLamel;
-    }
-
     manUpdateTabLabel();
-    manUpdateComponentLabels();
 
-    (function() {
-      const sel = document.getElementById("man-component");
-      let _prev = "";
-      sel.addEventListener("mousedown", function() { _prev = this.value; this.value = ""; });
-      sel.addEventListener("change",    function() { _prev = ""; manLoad(); });
-      sel.addEventListener("blur",      function() { if (!this.value && _prev) this.value = _prev; _prev = ""; });
-    })();
+    // Auto-load bij eerste klik op Handleiding tab
+    let manLoaded = false;
+    document.querySelector('[data-tab="handleiding"]').addEventListener("click", () => {
+      if (!manLoaded) { manLoaded = true; manLoad(); }
+    });
 
     document.getElementById("language").addEventListener("change", () => {
       manUpdateTabLabel();
-      manUpdateComponentLabels();
-      if (document.getElementById("man-component").value) manLoad();
+      if (manLoaded) { manMergedData = null; manLoaded = false; manLoad(); manLoaded = true; }
     });
 
     function escHtml(str) {
