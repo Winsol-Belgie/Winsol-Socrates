@@ -12,7 +12,7 @@
 
       <!-- HERO -->
       <header class="hero" role="banner" aria-label="Winsol SO!Crates header">
-        <h1 class="hero__title">Winsol SO!Crates (13-06-'26 v2)</h1>
+        <h1 class="hero__title">Winsol SO!Crates (13-06-'26 v3)</h1>
         <img class="hero__logo" src="SO-Crates_Logo_mini.png" alt="SO!Crates logo" />
       </header>
 
@@ -104,15 +104,16 @@
         <!-- Admin panel (verborgen tot login) -->
         <div id="admin-panel" style="display:none;">
 
-          <!-- Matrix sectie -->
+          <!-- Excel upload sectie (matrix + handleiding) -->
           <div class="ts-card" style="margin-bottom:12px;">
-            <h2>📊 Matrix updaten</h2>
+            <h2>📊 Excel uploaden</h2>
             <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;">
               <div class="language-wrapper">
                 <select id="admin-component">
                   <option value="screen">Screen</option>
                   <option value="led">LED</option>
                   <option value="lamel">Lamel</option>
+                  <option value="handleiding">Handleiding</option>
                 </select>
               </div>
               <label class="ts-btn secondary ts-btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
@@ -127,31 +128,6 @@
             </div>
             <div id="admin-matrix-preview" style="font-size:0.88rem;color:var(--muted);margin-top:10px;min-height:1.2em;"></div>
             <div id="admin-matrix-status" style="font-size:0.88rem;margin-top:6px;min-height:1.2em;"></div>
-          </div>
-
-          <!-- Handleiding sectie -->
-          <div class="ts-card" style="margin-bottom:12px;">
-            <h2>📖 Handleiding updaten</h2>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;">
-              <div class="language-wrapper">
-                <select id="admin-man-component">
-                  <option value="screen">Screen</option>
-                  <option value="led">LED</option>
-                  <option value="lamel">Lamel</option>
-                </select>
-              </div>
-              <label class="ts-btn secondary ts-btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
-                📂 Kies Excel-bestand
-                <input type="file" id="admin-man-excel-file" accept=".xlsx" style="display:none;">
-              </label>
-            </div>
-            <div id="admin-man-excel-name" style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;min-height:1.2em;"></div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              <button class="ts-btn secondary ts-btn-sm" id="admin-man-parse-btn" disabled>Verwerk Excel</button>
-              <button class="ts-btn primary ts-btn-sm" id="admin-man-upload-btn" disabled>Uploaden naar KV</button>
-            </div>
-            <div id="admin-man-preview" style="font-size:0.88rem;color:var(--muted);margin-top:10px;min-height:1.2em;"></div>
-            <div id="admin-man-status" style="font-size:0.88rem;margin-top:6px;min-height:1.2em;"></div>
           </div>
 
           <!-- PNG sectie -->
@@ -453,7 +429,7 @@
       }
     });
 
-    // Excel verwerken met SheetJS
+    // Excel verwerken met SheetJS (matrix én handleiding)
     document.getElementById("admin-parse-btn").addEventListener("click", async () => {
       const file = document.getElementById("admin-excel-file").files[0];
       const component = document.getElementById("admin-component").value;
@@ -461,34 +437,57 @@
       const preview = document.getElementById("admin-matrix-preview");
       preview.textContent = "Bezig met verwerken…";
       document.getElementById("admin-matrix-upload-btn").disabled = true;
+      adminParsedMatrix = null;
+      adminParsedManual = null;
       try {
         const data = await file.arrayBuffer();
         const workbook = XLSX.read(data, { type: "array" });
         const ws = workbook.Sheets[workbook.SheetNames[0]];
         const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
-        const matrix = adminParseExcel(rows, component);
 
-        // Auto-koppel PNG's op basis van naamconventie (bijv. LC01-01.png → oorzaak LC01)
-        try {
-          const pngRes = await fetch(`${TS_API}/admin/png-list`, {
-            headers: { "X-Admin-Password": adminPassword }
-          });
-          if (pngRes.ok) {
-            const { files } = await pngRes.json();
-            for (const code of Object.keys(matrix.causes)) {
-              const matching = files
-                .filter(f => f.toLowerCase().startsWith(code.toLowerCase() + "-") ||
-                             f.toLowerCase().startsWith(code.toLowerCase() + "."))
-                .sort();
-              if (matching.length) matrix.causes[code].images = matching;
+        if (component === "handleiding") {
+          // ── Handleiding parser ──
+          const manual = adminParseManualExcel(rows);
+          try {
+            const pngRes = await fetch(`${TS_API}/admin/png-list`, { headers: { "X-Admin-Password": adminPassword } });
+            if (pngRes.ok) {
+              const { files } = await pngRes.json();
+              for (const code of Object.keys(manual.stappen)) {
+                const matching = files
+                  .filter(f => f.toLowerCase().startsWith(code.toLowerCase() + "-") ||
+                               f.toLowerCase().startsWith(code.toLowerCase() + "."))
+                  .sort();
+                if (matching.length) manual.stappen[code].images = matching;
+              }
             }
-          }
-        } catch { /* niet-kritiek */ }
+          } catch { /* niet-kritiek */ }
+          adminParsedManual = manual;
+          const nM = Object.keys(manual.manuals).length;
+          const nS = Object.keys(manual.stappen).length;
+          const nL = Object.values(manual.stappen).filter(s => s.link).length;
+          preview.textContent = `✓ ${nM} handleidingen · ${nS} stappen · ${nL} links`;
+        } else {
+          // ── Matrix parser ──
+          const matrix = adminParseExcel(rows, component);
+          try {
+            const pngRes = await fetch(`${TS_API}/admin/png-list`, { headers: { "X-Admin-Password": adminPassword } });
+            if (pngRes.ok) {
+              const { files } = await pngRes.json();
+              for (const code of Object.keys(matrix.causes)) {
+                const matching = files
+                  .filter(f => f.toLowerCase().startsWith(code.toLowerCase() + "-") ||
+                               f.toLowerCase().startsWith(code.toLowerCase() + "."))
+                  .sort();
+                if (matching.length) matrix.causes[code].images = matching;
+              }
+            }
+          } catch { /* niet-kritiek */ }
+          adminParsedMatrix = matrix;
+          const nLinks  = Object.values(matrix.causes).filter(c => c.link).length;
+          const nImages = Object.values(matrix.causes).filter(c => c.images?.length).length;
+          preview.textContent = `✓ ${matrix.complaints.length} klachten · ${Object.keys(matrix.causes).length} oorzaken · ${nLinks} links · ${nImages} met afbeeldingen`;
+        }
 
-        adminParsedMatrix = matrix;
-        const nLinks  = Object.values(matrix.causes).filter(c => c.link).length;
-        const nImages = Object.values(matrix.causes).filter(c => c.images?.length).length;
-        preview.textContent = `✓ ${matrix.complaints.length} klachten · ${Object.keys(matrix.causes).length} oorzaken · ${nLinks} links · ${nImages} met afbeeldingen`;
         document.getElementById("admin-matrix-upload-btn").disabled = false;
       } catch (err) {
         preview.textContent = `Fout bij verwerken: ${err.message}`;
@@ -537,94 +536,26 @@
       return { component: componentName.toLowerCase(), required_info, complaints, causes };
     }
 
-    // Matrix uploaden naar KV
+    // Uploaden naar KV (matrix of handleiding)
     document.getElementById("admin-matrix-upload-btn").addEventListener("click", async () => {
-      if (!adminParsedMatrix) return;
       const statusEl = document.getElementById("admin-matrix-status");
+      const isManual = !!adminParsedManual;
+      const payload  = isManual ? adminParsedManual : adminParsedMatrix;
+      if (!payload) return;
       statusEl.textContent = "Bezig met uploaden…";
       try {
-        const res = await fetch(`${TS_API}/admin/matrix`, {
+        const endpoint = isManual ? `${TS_API}/admin/manual` : `${TS_API}/admin/matrix`;
+        const res = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json", "X-Admin-Password": adminPassword },
-          body: JSON.stringify(adminParsedMatrix),
-        });
-        const data = await res.json();
-        if (res.ok) {
-          statusEl.innerHTML = `<span style="color:green">✓ ${data.key} bijgewerkt (${data.complaints} klachten, ${data.causes} oorzaken)</span>`;
-        } else {
-          statusEl.innerHTML = `<span style="color:#c53030">Fout: ${data.error}</span>`;
-        }
-      } catch (err) {
-        statusEl.innerHTML = `<span style="color:#c53030">Fout: ${err.message}</span>`;
-      }
-    });
-
-    // ── Admin: handleiding ────────────────────────────────────────────────────
-    document.getElementById("admin-man-excel-file").addEventListener("change", function () {
-      const f = this.files[0];
-      if (f) {
-        document.getElementById("admin-man-excel-name").textContent = f.name;
-        document.getElementById("admin-man-parse-btn").disabled = false;
-        document.getElementById("admin-man-upload-btn").disabled = true;
-        document.getElementById("admin-man-preview").textContent = "";
-        document.getElementById("admin-man-status").textContent = "";
-        adminParsedManual = null;
-      }
-    });
-
-    document.getElementById("admin-man-parse-btn").addEventListener("click", async () => {
-      const file = document.getElementById("admin-man-excel-file").files[0];
-      const component = document.getElementById("admin-man-component").value;
-      if (!file) return;
-      const preview = document.getElementById("admin-man-preview");
-      preview.textContent = "Bezig met verwerken…";
-      document.getElementById("admin-man-upload-btn").disabled = true;
-      try {
-        const data = await file.arrayBuffer();
-        const workbook = XLSX.read(data, { type: "array" });
-        const ws = workbook.Sheets[workbook.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
-        const manual = adminParseManualExcel(rows, component);
-
-        // Auto-koppel PNG's op basis van stapcode-naamconventie
-        try {
-          const pngRes = await fetch(`${TS_API}/admin/png-list`, { headers: { "X-Admin-Password": adminPassword } });
-          if (pngRes.ok) {
-            const { files } = await pngRes.json();
-            for (const code of Object.keys(manual.stappen)) {
-              const matching = files
-                .filter(f => f.toLowerCase().startsWith(code.toLowerCase() + "-") ||
-                             f.toLowerCase().startsWith(code.toLowerCase() + "."))
-                .sort();
-              if (matching.length) manual.stappen[code].images = matching;
-            }
-          }
-        } catch { /* niet-kritiek */ }
-
-        adminParsedManual = manual;
-        const nM = Object.keys(manual.manuals).length;
-        const nS = Object.keys(manual.stappen).length;
-        const nL = Object.values(manual.stappen).filter(s => s.link).length;
-        preview.textContent = `✓ ${nM} handleidingen · ${nS} stappen · ${nL} links`;
-        document.getElementById("admin-man-upload-btn").disabled = false;
-      } catch (err) {
-        preview.textContent = `Fout bij verwerken: ${err.message}`;
-      }
-    });
-
-    document.getElementById("admin-man-upload-btn").addEventListener("click", async () => {
-      if (!adminParsedManual) return;
-      const statusEl = document.getElementById("admin-man-status");
-      statusEl.textContent = "Bezig met uploaden…";
-      try {
-        const res = await fetch(`${TS_API}/admin/manual`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "X-Admin-Password": adminPassword },
-          body: JSON.stringify(adminParsedManual),
+          body: JSON.stringify(payload),
         });
         const d = await res.json();
         if (res.ok) {
-          statusEl.innerHTML = `<span style="color:green">✓ ${d.key} bijgewerkt (${d.manuals} handleidingen, ${d.stappen} stappen)</span>`;
+          const info = isManual
+            ? `${d.manuals} handleidingen, ${d.stappen} stappen`
+            : `${d.complaints} klachten, ${d.causes} oorzaken`;
+          statusEl.innerHTML = `<span style="color:green">✓ ${d.key} bijgewerkt (${info})</span>`;
         } else {
           statusEl.innerHTML = `<span style="color:#c53030">Fout: ${d.error}</span>`;
         }
@@ -633,7 +564,7 @@
       }
     });
 
-    function adminParseManualExcel(rows, componentName) {
+function adminParseManualExcel(rows) {
       const headerRow = rows[0] || [];
       const dataRows  = rows.slice(1);
       // Detecteer aansturing-kolommen uit de header (kolommen H-N = index 7-13)
@@ -667,7 +598,7 @@
           stappen[g] = { titel: o, uitleg: String(row[15] || "").trim(), link: link || null, images: [], aansturing };
         }
       }
-      return { component: componentName.toLowerCase(), required_info, manuals, stappen };
+      return { required_info, manuals, stappen };
     }
 
     // PNG bestanden kiezen
@@ -760,14 +691,7 @@
         document.getElementById("admin-png-upload-btn").textContent   = "Uploaden";
         document.getElementById("admin-png-files").value              = "";
 
-        // Handleiding-sectie wissen
         adminParsedManual = null;
-        document.getElementById("admin-man-excel-name").textContent  = "";
-        document.getElementById("admin-man-preview").textContent     = "";
-        document.getElementById("admin-man-status").textContent      = "";
-        document.getElementById("admin-man-parse-btn").disabled      = true;
-        document.getElementById("admin-man-upload-btn").disabled     = true;
-        document.getElementById("admin-man-excel-file").value        = "";
 
         // Logs-sectie wissen
         document.getElementById("admin-logs-status").textContent  = "";
@@ -971,37 +895,25 @@
       const langCode = lang === "auto" ? (navigator.language || "nl").slice(0,2) : lang;
       manRender(`<div class="ts-loading">${manT().loading}</div>`);
 
-      // Laad alle componenten parallel, negeer 404's
-      const components = ["screen", "lamel", "led"];
-      const results = await Promise.allSettled(
-        components.map(c => fetch(`${TS_API}/manual?component=${c}&language=${langCode}`)
-          .then(r => r.ok ? r.json() : null))
-      );
-      const sources = results
-        .map(r => r.status === "fulfilled" ? r.value : null)
-        .filter(Boolean);
+      try {
+        const res = await fetch(`${TS_API}/manual?language=${langCode}`);
+        if (!res.ok) throw new Error(res.status);
+        const src = await res.json();
 
-      if (!sources.length) {
-        manRender(`<div class="ts-card"><div class="ts-error">${manT().noManual}</div></div>`); return;
-      }
-
-      // Samenvoegen: unieke aansturing-opties + alle handleidingen over alle componenten
-      const optionSet = new Set();
-      const allManuals = [];
-      for (const src of sources) {
+        const optionSet = new Set();
         for (const ri of src.required_info || []) {
           for (const opt of ri.opties || []) optionSet.add(opt);
         }
-        for (const [id, m] of Object.entries(src.manuals || {})) {
-          if (m.naam && m.stappen && m.stappen.length) {
-            allManuals.push({ id, naam: m.naam, stappen: m.stappen, source: src });
-          }
-        }
-      }
+        const allManuals = Object.entries(src.manuals || {})
+          .filter(([, m]) => m.naam && m.stappen && m.stappen.length)
+          .map(([id, m]) => ({ id, naam: m.naam, stappen: m.stappen, source: src }));
 
-      manMergedData = { options: Array.from(optionSet), manuals: allManuals, sources };
-      manControl = null; manCurrentManual = null; manCurrentSteps = []; manStep = 0;
-      manShowControl();
+        manMergedData = { options: Array.from(optionSet), manuals: allManuals, sources: [src] };
+        manControl = null; manCurrentManual = null; manCurrentSteps = []; manStep = 0;
+        manShowControl();
+      } catch {
+        manRender(`<div class="ts-card"><div class="ts-error">${manT().noManual}</div></div>`);
+      }
     }
 
     function manUpdateTabLabel() {
