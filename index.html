@@ -12,7 +12,7 @@
 
       <!-- HERO -->
       <header class="hero" role="banner" aria-label="Winsol SO!Crates header">
-        <h1 class="hero__title">Winsol SO!Crates (13-06-'26 v4)</h1>
+        <h1 class="hero__title">Winsol SO!Crates (13-06-'26 v5)</h1>
         <img class="hero__logo" src="SO-Crates_Logo_mini.png" alt="SO!Crates logo" />
       </header>
 
@@ -856,7 +856,7 @@ function adminParseManualExcel(rows) {
         <div class="ts-step-header">
           <div class="ts-step-badge">${manT().stepOf(n, total)}</div>
           <div class="ts-action-row">
-            <button class="ts-btn secondary ts-btn-sm" id="man-prev">${manStep === 0 ? manT().btnBack : manT().btnPrev}</button>
+            <button class="ts-btn secondary ts-btn-sm" id="man-prev">${manT().btnPrev}</button>
             ${isLast
               ? `<button class="ts-btn primary ts-btn-sm" id="man-finish">${manT().btnFinish}</button>`
               : `<button class="ts-btn primary ts-btn-sm" id="man-next">${manT().btnNext}</button>`}
