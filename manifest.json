@@ -1,0 +1,31 @@
+{
+  "name": "Winsol SO!Crates",
+  "short_name": "SO!Crates",
+  "description": "Technische hulplijn voor de Pergola SO!",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#f5c518",
+  "background_color": "#ffffff",
+  "lang": "nl",
+  "icons": [
+    {
+      "src": "SO-Crates_Icon.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,1203 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Winsol SO!Crates</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" type="image/png" href="SO-Crates_Icon.png" />
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#f5c518" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="SO!Crates" />
+    <link rel="apple-touch-icon" href="SO-Crates_Icon.png" />
+  </head>
+  <body>
+
+    <!-- ── LOGIN SCHERM ──────────────────────────────────────────────────── -->
+    <div id="login-screen" style="display:none;">
+      <div class="login-card">
+        <img src="SO-Crates_Logo_mini.png" alt="SO!Crates logo" class="login-logo" />
+        <h1 class="login-title">Winsol SO!Crates</h1>
+        <div class="login-form">
+          <input type="text" id="login-username" placeholder="Gebruikersnaam" autocomplete="username" />
+          <div class="login-pw-wrap">
+            <input type="password" id="login-password" placeholder="Wachtwoord" autocomplete="current-password" />
+            <button type="button" id="login-pw-toggle" class="login-pw-eye" title="Wachtwoord tonen/verbergen" tabindex="-1">
+              <svg id="eye-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg id="eye-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+            </button>
+          </div>
+          <label class="login-remember">
+            <input type="checkbox" id="login-remember" />
+            Blijf aangemeld
+          </label>
+          <button class="primary login-btn" id="login-submit-btn">Aanmelden</button>
+          <div id="login-error" class="login-error"></div>
+        </div>
+      </div>
+    </div>
+
+    <main class="container" id="main-app" style="display:none;">
+
+      <!-- HERO -->
+      <header class="hero" role="banner" aria-label="Winsol SO!Crates header">
+        <div>
+          <h1 class="hero__title">Winsol SO!Crates (14-06-'26 v1)</h1>
+          <div class="hero__user">
+            <span id="hero-username" class="hero__username"></span>
+            <button id="logoutBtn" class="btn-secondary btn-logout" title="Afmelden">Afmelden</button>
+          </div>
+        </div>
+        <img class="hero__logo" src="SO-Crates_Logo_mini.png" alt="SO!Crates logo" />
+      </header>
+
+      <!-- TOOLBAR -->
+      <div class="toolbar">
+        <div class="fields">
+          <div class="language-box">
+            <div class="language-wrapper">
+              <select id="language">
+                <option value="auto" selected>Automatic</option>
+                <option value="nl">Nederlands</option>
+                <option value="fr">Français</option>
+                <option value="en">English</option>
+                <option value="de">Deutsch</option>
+                <option value="es">Español</option>
+                <option value="it">Italiano</option>
+              </select>
+            </div>
+            <svg class="lang-icon" viewBox="0 0 24 24">
+              <path fill="#555" d="M12 2a10 10 0 100 20 10 10 0 000-20zm7.93 9h-3.05a15.1 15.1 0 00-1.12-5.18 8.03 8.03 0 014.17 5.18zM12 4c.88 1.14 1.57 2.71 1.97 4.5H10.03C10.43 6.71 11.12 5.14 12 4zm-3.76.82A15.1 15.1 0 006.12 11H3.07a8.03 8.03 0 015.17-6.18zM3.07 13h3.05a15.1 15.1 0 001.12 5.18A8.03 8.03 0 013.07 13zm8.93 7c-.88-1.14-1.57-2.71-1.97-4.5h3.94c-.4 1.79-1.09 3.36-1.97 4.5zm3.76-.82a15.1 15.1 0 001.12-5.18h3.05a8.03 8.03 0 01-4.17 5.18z"/>
+            </svg>
+            <button type="button" id="mailBtn" class="btn-secondary">Mail</button>
+            <a id="pdfBtn" class="btn-secondary"
+               href="https://winsolgroup.sharepoint.com/sites/SunprotectionAndOutdoorLiving/PublishedDocuments/Forms/BIB%20RD.aspx?viewid=9bb1db15%2D1a0f%2D4455%2Db0b0%2D0d2356e1ea0c&id=%2Fsites%2FSunprotectionAndOutdoorLiving%2FPublishedDocuments%2FPRODUCTS%2FPERGOLA%2FSO%21%2FSO%21%5FSPECS%5F2025%2D00%2Epdf&parent=%2Fsites%2FSunprotectionAndOutdoorLiving%2FPublishedDocuments%2FPRODUCTS%2FPERGOLA%2FSO%21"
+               target="_blank" rel="noopener noreferrer">PDF</a>
+          </div>
+        </div>
+        <div class="actions">
+          <button id="resetBtn" title="New conversation">Reset</button>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="chat">Chat</button>
+        <button class="tab-btn" id="tab-btn-troubleshoot" data-tab="troubleshoot">Probleemoplossing</button>
+        <button class="tab-btn" id="tab-btn-handleiding" data-tab="handleiding">Handleiding</button>
+        <button class="tab-btn" id="tab-btn-admin" data-tab="admin" style="display:none;">Admin</button>
+      </div>
+
+      <!-- TAB: CHAT -->
+      <div id="tab-chat" class="tab-panel active">
+        <div id="chat" class="chat" aria-live="polite"></div>
+        <div class="composer">
+          <textarea id="input" rows="3" placeholder="Type your question... (Shift+Enter = new line)"></textarea>
+          <button id="micBtn" class="mic-btn" title="Spreek je vraag in">🎤</button>
+          <button id="sendBtn" class="primary">Send</button>
+        </div>
+        <div id="status" class="status"></div>
+      </div>
+
+      <!-- TAB: PROBLEEMOPLOSSING -->
+      <div id="tab-troubleshoot" class="tab-panel">
+        <div class="ts-toolbar">
+          <div class="language-wrapper">
+            <select id="ts-component">
+              <option value="">— Kies component —</option>
+              <option value="screen">Screen</option>
+              <option value="led">LED</option>
+              <option value="lamel">Lamel</option>
+            </select>
+          </div>
+        </div>
+        <div id="ts-app">
+          <div class="ts-loading" id="ts-placeholder">Kies een component om te starten.</div>
+        </div>
+      </div>
+
+      <!-- TAB: HANDLEIDING -->
+      <div id="tab-handleiding" class="tab-panel">
+        <div id="man-app">
+          <div class="ts-loading">Handleiding laden…</div>
+        </div>
+      </div>
+
+      <!-- TAB: ADMIN -->
+      <div id="tab-admin" class="tab-panel">
+
+        <!-- Admin panel -->
+        <div id="admin-panel">
+
+          <!-- Excel upload sectie (matrix + handleiding) -->
+          <div class="ts-card" style="margin-bottom:12px;">
+            <h2>📊 Excel uploaden</h2>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;">
+              <div class="language-wrapper">
+                <select id="admin-component">
+                  <option value="screen">Screen</option>
+                  <option value="led">LED</option>
+                  <option value="lamel">Lamel</option>
+                  <option value="handleiding">Handleiding</option>
+                  <option value="users">Gebruikers</option>
+                </select>
+              </div>
+              <label class="ts-btn secondary ts-btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+                📂 Kies Excel-bestand
+                <input type="file" id="admin-excel-file" accept=".xlsx" style="display:none;">
+              </label>
+            </div>
+            <div id="admin-excel-name" style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;min-height:1.2em;"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="ts-btn secondary ts-btn-sm" id="admin-parse-btn" disabled>Verwerk Excel</button>
+              <button class="ts-btn primary ts-btn-sm" id="admin-matrix-upload-btn" disabled>Uploaden naar KV</button>
+              <button class="ts-btn secondary ts-btn-sm" id="admin-translate-btn">🌐 Vertalen</button>
+            </div>
+            <div id="admin-matrix-preview" style="font-size:0.88rem;color:var(--muted);margin-top:10px;min-height:1.2em;"></div>
+            <div id="admin-matrix-status" style="font-size:0.88rem;margin-top:6px;min-height:1.2em;"></div>
+          </div>
+
+          <!-- PNG sectie -->
+          <div class="ts-card">
+            <h2>🖼️ PNG's uploaden</h2>
+            <p style="font-size:0.85rem;color:var(--muted);margin:0 0 12px;">
+              PNG-bestandsnamen beginnen met de oorzaakcode (bv. <code>SC05-01.png</code>).
+              Na het uploaden zijn ze beschikbaar via de Worker.
+            </p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;">
+              <label class="ts-btn secondary ts-btn-sm" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+                📂 Kies PNG-bestanden
+                <input type="file" id="admin-png-files" accept=".png,image/png" multiple style="display:none;">
+              </label>
+              <button class="ts-btn primary ts-btn-sm" id="admin-png-upload-btn" disabled>Uploaden</button>
+            </div>
+            <div id="admin-png-list" style="font-size:0.85rem;color:var(--muted);margin-bottom:8px;min-height:1.2em;"></div>
+            <div id="admin-png-status" style="font-size:0.88rem;margin-top:6px;"></div>
+          </div>
+
+          <!-- Logs sectie -->
+          <div class="ts-card" style="margin-top:12px;">
+            <h2>📋 Logs</h2>
+            <p style="font-size:0.85rem;color:var(--muted);margin:0 0 12px;">
+              Elke vraag en het bijhorende antwoord worden opgeslagen in de LOGS KV (bewaard gedurende 90 dagen).
+            </p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+              <button class="ts-btn secondary ts-btn-sm" id="admin-logs-fetch-btn">📥 LOG's ophalen</button>
+              <button class="ts-btn danger ts-btn-sm" id="admin-logs-reset-btn">🗑️ LOG's resetten</button>
+              <button class="ts-btn secondary ts-btn-sm" id="admin-logs-debug-btn" style="opacity:0.6;font-size:0.8rem;">🔧 Debug</button>
+            </div>
+            <div id="admin-logs-status" style="font-size:0.85rem;color:var(--muted);margin-bottom:8px;min-height:1.2em;"></div>
+            <div id="admin-logs-display" style="font-size:0.82rem;max-height:420px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;padding:0 10px;"></div>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script type="module" src="app.js"></script>
+
+    <script>
+    // ── Tab switching ────────────────────────────────────────────────────────
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+      });
+    });
+
+    // ── Troubleshoot tool ────────────────────────────────────────────────────
+    const TS_API = "https://winsol-socrates-dev.gwenn-vanthournout.workers.dev";
+
+    const tsLabels = {
+      nl: { loading:"Matrix laden…", chooseControl:"Type aansturing?", chooseComplaint:"Wat is het probleem?",
+            solved:"✓ Opgelost", notHelped:"→ Volgende oorzaak", prev:"← Vorige oorzaak",
+            doneSolved:"Probleem opgelost!", doneNoMore:'Geen verdere oorzaak. Neem contact op met <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>.',
+            restart:"Opnieuw starten", noMatrix:"Matrix niet beschikbaar voor dit component.", start:"Kies een component om te starten.",
+            labelCause:"Mogelijke oorzaak", labelAction:"Voorgestelde actie",
+            tabTroubleshoot:"Probleemoplossing", linkText:"Zie link voor meer uitleg",
+            chooseComponent:"— Kies component —", compScreen:"Screen", compLed:"LED", compLamel:"Lamel" },
+      fr: { loading:"Chargement…", chooseControl:"Type de commande ?", chooseComplaint:"Quel est le problème ?",
+            solved:"✓ Résolu", notHelped:"→ Cause suivante", prev:"← Cause précédente",
+            doneSolved:"Problème résolu !", doneNoMore:'Aucune autre cause. Contactez <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>.',
+            restart:"Recommencer", noMatrix:"Matrice non disponible.", start:"Choisissez un composant.",
+            labelCause:"Cause possible", labelAction:"Action suggérée",
+            tabTroubleshoot:"Dépannage", linkText:"Voir le lien pour plus d'informations",
+            chooseComponent:"— Choisir le composant —", compScreen:"Screen", compLed:"LED", compLamel:"Lame" },
+      en: { loading:"Loading…", chooseControl:"Control type?", chooseComplaint:"What is the problem?",
+            solved:"✓ Solved", notHelped:"→ Next cause", prev:"← Previous cause",
+            doneSolved:"Problem solved!", doneNoMore:'No further cause found. Contact <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>.',
+            restart:"Start over", noMatrix:"Matrix not available.", start:"Choose a component.",
+            labelCause:"Possible cause", labelAction:"Suggested action",
+            tabTroubleshoot:"Troubleshooting", linkText:"See link for more information",
+            chooseComponent:"— Choose component —", compScreen:"Screen", compLed:"LED", compLamel:"Louvre" },
+      de: { loading:"Wird geladen…", chooseControl:"Steuerungstyp?", chooseComplaint:"Was ist das Problem?",
+            solved:"✓ Gelöst", notHelped:"→ Nächste Ursache", prev:"← Vorherige Ursache",
+            doneSolved:"Problem gelöst!", doneNoMore:'Keine weiteren Ursachen. Kontakt: <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>.',
+            restart:"Neu starten", noMatrix:"Matrix nicht verfügbar.", start:"Komponente wählen.",
+            labelCause:"Mögliche Ursache", labelAction:"Empfohlene Maßnahme",
+            tabTroubleshoot:"Fehlerbehebung", linkText:"Siehe Link für weitere Informationen",
+            chooseComponent:"— Komponente wählen —", compScreen:"Screen", compLed:"LED", compLamel:"Lamelle" },
+      es: { loading:"Cargando…", chooseControl:"¿Tipo de control?", chooseComplaint:"¿Cuál es el problema?",
+            solved:"✓ Resuelto", notHelped:"→ Causa siguiente", prev:"← Causa anterior",
+            doneSolved:"¡Problema resuelto!", doneNoMore:'Sin más causas. Contacte: <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>.',
+            restart:"Reiniciar", noMatrix:"Matriz no disponible.", start:"Elija un componente.",
+            labelCause:"Posible causa", labelAction:"Acción sugerida",
+            tabTroubleshoot:"Solución de problemas", linkText:"Ver enlace para más información",
+            chooseComponent:"— Elegir componente —", compScreen:"Screen", compLed:"LED", compLamel:"Lama" },
+      it: { loading:"Caricamento…", chooseControl:"Tipo di controllo?", chooseComplaint:"Qual è il problema?",
+            solved:"✓ Risolto", notHelped:"→ Causa successiva", prev:"← Causa precedente",
+            doneSolved:"Problema risolto!", doneNoMore:'Nessun\'altra causa. Contattare: <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>.',
+            restart:"Ricominciare", noMatrix:"Matrice non disponibile.", start:"Scegliere un componente.",
+            labelCause:"Possibile causa", labelAction:"Azione suggerita",
+            tabTroubleshoot:"Risoluzione dei problemi", linkText:"Vedi link per ulteriori informazioni",
+            chooseComponent:"— Scegliere componente —", compScreen:"Screen", compLed:"LED", compLamel:"Lamella" },
+    };
+
+    function tsT() {
+      const l = (document.getElementById("language").value || "auto");
+      const code = l === "auto" ? (navigator.language || "nl").slice(0,2) : l;
+      return tsLabels[code] || tsLabels.nl;
+    }
+
+    let tsMatrix = null, tsControl = null, tsComplaint = null, tsCauses = [], tsStep = 0;
+    const tsApp = () => document.getElementById("ts-app");
+
+    function tsRender(html) { tsApp().innerHTML = html; }
+
+    function tsCard(title, body) {
+      return `<div class="ts-card"><h2>${title}</h2>${body}</div>`;
+    }
+
+    function tsShowControl() {
+      const ri = tsMatrix.required_info[0];
+      let btns = ri.opties.map((opt, i) =>
+        `<button class="ts-btn" data-idx="${i}">${opt}</button>`).join("");
+      tsRender(tsCard(ri.vraag, `<div class="ts-btn-list">${btns}</div>`));
+      tsApp().querySelectorAll(".ts-btn").forEach((btn, i) => {
+        btn.addEventListener("click", () => {
+          tsControl = ri.opties[i].toLowerCase().includes("casambi") ? "casambi" : "somfy";
+          tsShowComplaints();
+        });
+      });
+    }
+
+    function tsApplicableComplaints() {
+      return tsMatrix.complaints.filter(c =>
+        c.klacht && c.oorzaken_volgorde.some(code => {
+          const cause = tsMatrix.causes[code];
+          return cause && ((tsControl === "casambi" && cause.casambi) || (tsControl === "somfy" && cause.somfy));
+        })
+      );
+    }
+
+    function tsShowComplaints() {
+      const list = tsApplicableComplaints();
+      let btns = list.map((c, i) => `<button class="ts-btn" data-idx="${i}">${c.klacht}</button>`).join("");
+      tsRender(tsCard(tsT().chooseComplaint, `<div class="ts-btn-list">${btns}</div>`));
+      tsApp().querySelectorAll(".ts-btn").forEach((btn, i) => {
+        btn.addEventListener("click", () => { tsComplaint = list[i]; tsStartDiagnosis(); });
+      });
+    }
+
+    function tsStartDiagnosis() {
+      tsCauses = tsComplaint.oorzaken_volgorde.filter(code => {
+        const c = tsMatrix.causes[code];
+        return c && ((tsControl === "casambi" && c.casambi) || (tsControl === "somfy" && c.somfy));
+      });
+      tsStep = 0;
+      tsShowStep();
+    }
+
+    function tsShowStep() {
+      if (tsStep >= tsCauses.length) { tsShowDone(false); return; }
+      const cause = tsMatrix.causes[tsCauses[tsStep]];
+      const n = tsStep + 1, total = tsCauses.length;
+      const linkHtml = cause.link
+        ? `<div class="ts-step-link"><a href="${cause.link}" target="_blank" rel="noopener noreferrer">${tsT().linkText}</a></div>`
+        : "";
+      const imagesHtml = (cause.images && cause.images.length)
+        ? `<div class="ts-step-images">${cause.images.map(f =>
+            `<img src="${TS_API}/png/${f}" alt="${f}" class="ts-step-img" loading="lazy" />`
+          ).join("")}</div>`
+        : "";
+      tsRender(`<div class="ts-card">
+        <div class="ts-step-header">
+          <div class="ts-step-badge">${n} / ${total}</div>
+          <div class="ts-action-row">
+            <button class="ts-btn secondary ts-btn-sm" id="ts-prev" style="${tsStep === 0 ? 'visibility:hidden' : ''}">${tsT().prev}</button>
+            <button class="ts-btn primary ts-btn-sm" id="ts-solved">${tsT().solved}</button>
+            <button class="ts-btn secondary ts-btn-sm" id="ts-next">${tsT().notHelped}</button>
+          </div>
+        </div>
+        <div class="ts-complaint-label">${tsComplaint.klacht}</div>
+        ${cause.omschrijving ? `<div class="ts-step-field"><span class="ts-step-label">${tsT().labelCause}:</span> ${cause.omschrijving}</div>` : ""}
+        <div class="ts-step-field"><span class="ts-step-label">${tsT().labelAction}:</span> ${cause.oplossing}</div>
+        ${imagesHtml}
+        ${linkHtml}
+      </div>`);
+      document.getElementById("ts-prev").addEventListener("click", () => { if (tsStep > 0) { tsStep--; tsShowStep(); } });
+      document.getElementById("ts-solved").addEventListener("click", () => tsShowDone(true));
+      document.getElementById("ts-next").addEventListener("click", () => { tsStep++; tsShowStep(); });
+    }
+
+    function tsShowDone(solved) {
+      const msg = solved ? tsT().doneSolved : tsT().doneNoMore;
+      tsRender(`<div class="ts-card ts-done">
+        <h2>${msg}</h2>
+        <button class="ts-btn primary" id="ts-restart">${tsT().restart}</button>
+      </div>`);
+      document.getElementById("ts-restart").addEventListener("click", tsReset);
+    }
+
+    function tsReset() {
+      tsControl = null; tsComplaint = null; tsCauses = []; tsStep = 0;
+      if (tsMatrix) tsShowControl();
+    }
+
+    async function tsLoad() {
+      const component = document.getElementById("ts-component").value;
+      const lang = (document.getElementById("language").value || "auto");
+      const langCode = lang === "auto" ? (navigator.language || "nl").slice(0,2) : lang;
+      if (!component) { tsRender(`<div class="ts-loading">${tsT().start}</div>`); return; }
+      tsRender(`<div class="ts-loading">${tsT().loading}</div>`);
+      try {
+        const res = await fetch(`${TS_API}/matrix?component=${component}&language=${langCode}`);
+        if (!res.ok) throw new Error(res.status);
+        tsMatrix = await res.json();
+        tsControl = null; tsComplaint = null; tsCauses = []; tsStep = 0;
+        tsShowControl();
+      } catch {
+        tsRender(`<div class="ts-card"><div class="ts-error">${tsT().noMatrix}</div></div>`);
+      }
+    }
+
+    // Tab-label en component-dropdown bijwerken bij taalwissel
+    function tsUpdateTabLabel() {
+      document.getElementById("tab-btn-troubleshoot").textContent = tsT().tabTroubleshoot;
+    }
+
+    function tsUpdateComponentLabels() {
+      const t = tsT();
+      const sel = document.getElementById("ts-component");
+      sel.options[0].text = t.chooseComponent;
+      sel.options[1].text = t.compScreen;
+      sel.options[2].text = t.compLed;
+      sel.options[3].text = t.compLamel;
+    }
+
+    tsUpdateTabLabel();
+    tsUpdateComponentLabels(); // initieel instellen
+
+    // Component select: change én herselect van dezelfde waarde triggeren tsLoad
+    (function() {
+      const sel = document.getElementById("ts-component");
+      let _prev = "";
+      sel.addEventListener("mousedown", function() {
+        _prev = this.value;
+        this.value = ""; // zodat change altijd vuurt, ook bij dezelfde keuze
+      });
+      sel.addEventListener("change", function() {
+        _prev = "";
+        tsLoad();
+      });
+      sel.addEventListener("blur", function() {
+        if (!this.value && _prev) this.value = _prev; // herstel bij Escape/klik-buiten
+        _prev = "";
+      });
+    })();
+    document.getElementById("language").addEventListener("change", () => {
+      tsUpdateTabLabel();
+      tsUpdateComponentLabels();
+      if (document.getElementById("ts-component").value) tsLoad();
+    });
+
+    // ── Auth state ───────────────────────────────────────────────────────────
+    let authToken    = null;
+    let authUsername = null;
+    let authRole     = null;
+
+    function authHeaders() {
+      return { "X-Auth-Token": authToken };
+    }
+
+    function showApp(username, role) {
+      authUsername = username;
+      authRole     = role;
+      document.getElementById("login-screen").style.display = "none";
+      document.getElementById("main-app").style.display     = "block";
+      document.getElementById("hero-username").textContent  = username;
+      if (role === "admin") {
+        document.getElementById("tab-btn-admin").style.display = "";
+      }
+    }
+
+    function showLogin() {
+      document.getElementById("login-screen").style.display = "flex";
+      document.getElementById("main-app").style.display     = "none";
+    }
+
+    // ── Login scherm ─────────────────────────────────────────────────────────
+    document.getElementById("login-submit-btn").addEventListener("click", doLogin);
+    document.getElementById("login-password").addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
+    document.getElementById("login-username").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("login-password").focus(); });
+    document.getElementById("login-pw-toggle").addEventListener("click", () => {
+      const pw = document.getElementById("login-password");
+      const isHidden = pw.type === "password";
+      pw.type = isHidden ? "text" : "password";
+      document.getElementById("eye-open").style.display   = isHidden ? "none"  : "";
+      document.getElementById("eye-closed").style.display = isHidden ? ""      : "none";
+    });
+
+    async function doLogin() {
+      const username = document.getElementById("login-username").value.trim();
+      const password = document.getElementById("login-password").value;
+      const remember = document.getElementById("login-remember").checked;
+      const errEl    = document.getElementById("login-error");
+      const btn      = document.getElementById("login-submit-btn");
+      if (!username || !password) { errEl.textContent = "Vul gebruikersnaam en wachtwoord in."; return; }
+      errEl.textContent = "";
+      btn.disabled = true;
+      btn.textContent = "Aanmelden…";
+      try {
+        const res  = await fetch(`${TS_API}/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password, remember }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          errEl.textContent = data.error || "Aanmelden mislukt.";
+          return;
+        }
+        authToken = data.token;
+        localStorage.setItem("socrates_token", authToken);
+        showApp(data.username, data.role);
+      } catch {
+        errEl.textContent = "Verbinding mislukt.";
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Aanmelden";
+      }
+    }
+
+    // ── Token check bij laden ────────────────────────────────────────────────
+    async function checkSession() {
+      const token = localStorage.getItem("socrates_token");
+      if (!token) { showLogin(); return; }
+      authToken = token;
+      try {
+        const res  = await fetch(`${TS_API}/auth/me`, { headers: { "X-Auth-Token": token } });
+        if (res.ok) {
+          const data = await res.json();
+          showApp(data.username, data.role);
+        } else {
+          localStorage.removeItem("socrates_token");
+          authToken = null;
+          showLogin();
+        }
+      } catch {
+        // Offline of worker onbeschikbaar: toon login zodat gebruiker kan proberen
+        localStorage.removeItem("socrates_token");
+        authToken = null;
+        showLogin();
+      }
+    }
+
+    checkSession();
+
+    // ── Uitloggen ────────────────────────────────────────────────────────────
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      if (authToken) {
+        try { await fetch(`${TS_API}/logout`, { method: "POST", headers: { "X-Auth-Token": authToken } }); } catch {}
+      }
+      authToken    = null;
+      authUsername = null;
+      authRole     = null;
+      localStorage.removeItem("socrates_token");
+      // Admin tab verbergen bij uitloggen
+      document.getElementById("tab-btn-admin").style.display = "none";
+      // Zeker Chat tab activeren
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+      document.querySelector('[data-tab="chat"]').classList.add("active");
+      document.getElementById("tab-chat").classList.add("active");
+      showLogin();
+    });
+
+    // ── Admin tab ────────────────────────────────────────────────────────────
+    let adminParsedMatrix = null;
+    let adminParsedManual = null;
+    let adminPngFiles = [];
+
+    // Excel bestand kiezen
+    document.getElementById("admin-excel-file").addEventListener("change", function () {
+      const f = this.files[0];
+      if (f) {
+        document.getElementById("admin-excel-name").textContent = f.name;
+        document.getElementById("admin-parse-btn").disabled = false;
+        document.getElementById("admin-matrix-upload-btn").disabled = true;
+        document.getElementById("admin-matrix-preview").textContent = "";
+        document.getElementById("admin-matrix-status").textContent = "";
+        adminParsedMatrix = null;
+      }
+    });
+
+    // Excel verwerken met SheetJS (matrix én handleiding)
+    document.getElementById("admin-parse-btn").addEventListener("click", async () => {
+      const file = document.getElementById("admin-excel-file").files[0];
+      const component = document.getElementById("admin-component").value;
+      if (!file) return;
+      const preview = document.getElementById("admin-matrix-preview");
+      preview.textContent = "Bezig met verwerken…";
+      document.getElementById("admin-matrix-upload-btn").disabled = true;
+      adminParsedMatrix = null;
+      adminParsedManual = null;
+      try {
+        const data = await file.arrayBuffer();
+        const workbook = XLSX.read(data, { type: "array" });
+        const ws = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
+
+        if (component === "users") {
+          // ── USERS parser ──
+          const users = adminParseUsersExcel(rows);
+          adminParsedMatrix = { _type: "users", users };
+          preview.textContent = `✓ ${users.length} gebruiker${users.length !== 1 ? "s" : ""} (wachtwoorden worden bij upload gehasht)`;
+          document.getElementById("admin-matrix-upload-btn").disabled = false;
+        } else if (component === "handleiding") {
+          // ── Handleiding parser ──
+          const manual = adminParseManualExcel(rows);
+          try {
+            const pngRes = await fetch(`${TS_API}/admin/png-list`, { headers: { "X-Auth-Token": authToken } });
+            if (pngRes.ok) {
+              const { files } = await pngRes.json();
+              for (const code of Object.keys(manual.stappen)) {
+                const matching = files
+                  .filter(f => f.toLowerCase().startsWith(code.toLowerCase() + "-") ||
+                               f.toLowerCase().startsWith(code.toLowerCase() + "."))
+                  .sort();
+                if (matching.length) manual.stappen[code].images = matching;
+              }
+            }
+          } catch { /* niet-kritiek */ }
+          adminParsedManual = manual;
+          const nM = Object.keys(manual.manuals).length;
+          const nS = Object.keys(manual.stappen).length;
+          const nL = Object.values(manual.stappen).filter(s => s.link).length;
+          preview.textContent = `✓ ${nM} handleidingen · ${nS} stappen · ${nL} links`;
+        } else {
+          // ── Matrix parser ──
+          const matrix = adminParseExcel(rows, component);
+          try {
+            const pngRes = await fetch(`${TS_API}/admin/png-list`, { headers: { "X-Auth-Token": authToken } });
+            if (pngRes.ok) {
+              const { files } = await pngRes.json();
+              for (const code of Object.keys(matrix.causes)) {
+                const matching = files
+                  .filter(f => f.toLowerCase().startsWith(code.toLowerCase() + "-") ||
+                               f.toLowerCase().startsWith(code.toLowerCase() + "."))
+                  .sort();
+                if (matching.length) matrix.causes[code].images = matching;
+              }
+            }
+          } catch { /* niet-kritiek */ }
+          adminParsedMatrix = matrix;
+          const nLinks  = Object.values(matrix.causes).filter(c => c.link).length;
+          const nImages = Object.values(matrix.causes).filter(c => c.images?.length).length;
+          preview.textContent = `✓ ${matrix.complaints.length} klachten · ${Object.keys(matrix.causes).length} oorzaken · ${nLinks} links · ${nImages} met afbeeldingen`;
+        }
+
+        document.getElementById("admin-matrix-upload-btn").disabled = false;
+      } catch (err) {
+        preview.textContent = `Fout bij verwerken: ${err.message}`;
+      }
+    });
+
+    function adminParseExcel(rows, componentName) {
+      const dataRows = rows.slice(1);
+      const required_info = [], complaints = [], causes = {};
+      const seenRI = new Set(), seenC = new Set();
+      for (const row of dataRows) {
+        const a = String(row[0] || "").trim();
+        const b = String(row[1] || "").trim();
+        if (a && b && !seenRI.has(a)) {
+          seenRI.add(a);
+          required_info.push({
+            code: a,
+            vraag: b,
+            opties: String(row[2] || "").split(",").map(s => s.trim()).filter(Boolean),
+          });
+        }
+        const d = String(row[3] || "").trim();
+        const e = String(row[4] || "").trim();
+        if (d && e && !seenC.has(d)) {
+          seenC.add(d);
+          complaints.push({
+            code: d,
+            klacht: e,
+            oorzaken_volgorde: String(row[5] || "").split(",").map(s => s.trim()).filter(Boolean),
+          });
+        }
+        const g = String(row[6] || "").trim();
+        const j = String(row[9] || "").trim();
+        if (g && j && !causes[g]) {
+          const entry = {
+            casambi: String(row[7] || "").trim().toLowerCase() === "ja",
+            somfy:   String(row[8] || "").trim().toLowerCase() === "ja",
+            omschrijving: j,
+            oplossing:    String(row[10] || "").trim(),
+          };
+          const link = String(row[11] || "").trim();
+          if (link) entry.link = link;
+          causes[g] = entry;
+        }
+      }
+      return { component: componentName.toLowerCase(), required_info, complaints, causes };
+    }
+
+    // Uploaden naar KV (matrix of handleiding)
+    document.getElementById("admin-matrix-upload-btn").addEventListener("click", async () => {
+      const statusEl = document.getElementById("admin-matrix-status");
+      if (!adminParsedMatrix && !adminParsedManual) return;
+      statusEl.textContent = "Bezig met uploaden…";
+      try {
+        // USERS upload
+        if (adminParsedMatrix && adminParsedMatrix._type === "users") {
+          const res = await fetch(`${TS_API}/admin/users`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-Auth-Token": authToken },
+            body: JSON.stringify(adminParsedMatrix.users),
+          });
+          const d = await res.json();
+          if (res.ok) {
+            statusEl.innerHTML = `<span style="color:green">✓ ${d.users} gebruiker${d.users !== 1 ? "s" : ""} opgeslagen (wachtwoorden gehasht)</span>`;
+          } else {
+            statusEl.innerHTML = `<span style="color:#c53030">Fout: ${d.error}</span>`;
+          }
+          return;
+        }
+        // Handleiding of Matrix upload
+        const isManual = !!adminParsedManual;
+        const payload  = isManual ? adminParsedManual : adminParsedMatrix;
+        const endpoint = isManual ? `${TS_API}/admin/manual` : `${TS_API}/admin/matrix`;
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-Auth-Token": authToken },
+          body: JSON.stringify(payload),
+        });
+        const d = await res.json();
+        if (res.ok) {
+          const info = isManual
+            ? `${d.manuals} handleidingen, ${d.stappen} stappen`
+            : `${d.complaints} klachten, ${d.causes} oorzaken`;
+          statusEl.innerHTML = `<span style="color:green">✓ ${d.key} bijgewerkt (${info})</span>`;
+        } else {
+          statusEl.innerHTML = `<span style="color:#c53030">Fout: ${d.error}</span>`;
+        }
+      } catch (err) {
+        statusEl.innerHTML = `<span style="color:#c53030">Fout: ${err.message}</span>`;
+      }
+    });
+
+    document.getElementById("admin-translate-btn").addEventListener("click", async () => {
+      const statusEl = document.getElementById("admin-matrix-status");
+      const btn = document.getElementById("admin-translate-btn");
+      btn.disabled = true;
+      statusEl.innerHTML = `<span style="color:#888">🌐 Vertalingen worden gegenereerd… (kan 30-60s duren)</span>`;
+      try {
+        const res = await fetch(`${TS_API}/admin/translate-all`, {
+          method: "POST",
+          headers: { "X-Auth-Token": authToken },
+        });
+        const d = await res.json();
+        if (res.ok) {
+          const failInfo = d.failed && d.failed.length ? ` · ${d.failed.length} mislukt` : "";
+          statusEl.innerHTML = `<span style="color:green">✓ ${d.translated}/${d.total} vertalingen gecached${failInfo}</span>`;
+        } else {
+          statusEl.innerHTML = `<span style="color:#c53030">Fout: ${d.error}</span>`;
+        }
+      } catch (err) {
+        statusEl.innerHTML = `<span style="color:#c53030">Fout: ${err.message}</span>`;
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    function adminParseUsersExcel(rows) {
+      // Verwacht header: USER | PW | ROLE (of username/password/role, case-insensitief)
+      // Geeft array terug van { username, password, role }
+      if (!rows || rows.length < 2) return [];
+      const header = rows[0].map(h => String(h || "").trim().toLowerCase());
+      const colUser = header.findIndex(h => h === "user" || h === "username" || h === "gebruiker");
+      const colPw   = header.findIndex(h => h === "pw" || h === "password" || h === "wachtwoord");
+      const colRole = header.findIndex(h => h === "role" || h === "rol");
+      if (colUser < 0 || colPw < 0) return [];
+      const users = [];
+      for (const row of rows.slice(1)) {
+        const username = String(row[colUser] || "").trim();
+        const password = String(row[colPw]   || "").trim();
+        if (!username || !password) continue;
+        users.push({
+          username,
+          password,
+          role: colRole >= 0 ? String(row[colRole] || "").trim().toLowerCase() : "user",
+        });
+      }
+      return users;
+    }
+
+    function adminParseManualExcel(rows) {
+      const headerRow = rows[0] || [];
+      const dataRows  = rows.slice(1);
+      // Detecteer aansturing-kolommen uit de header (kolommen H-N = index 7-13)
+      const aansturingCols = {};
+      for (let i = 7; i <= 13; i++) {
+        const v = String(headerRow[i] || "").trim();
+        if (v) aansturingCols[i] = v;
+      }
+      const required_info = [], manuals = {}, stappen = {};
+      const seenRI = new Set();
+      for (const row of dataRows) {
+        const a = String(row[0] || "").trim();
+        const b = String(row[1] || "").trim();
+        if (a && b && a.startsWith("MS") && !seenRI.has(a)) {
+          seenRI.add(a);
+          required_info.push({ id: a, vraag: b, opties: String(row[2] || "").split(",").map(s => s.trim()).filter(Boolean) });
+        }
+        const d = String(row[3] || "").trim();
+        const e = String(row[4] || "").trim();
+        if (d && e && !manuals[d]) {
+          manuals[d] = { naam: e, stappen: String(row[5] || "").split(",").map(s => s.trim()).filter(Boolean) };
+        }
+        const g = String(row[6] || "").trim();
+        const o = String(row[14] || "").trim();  // kolom O
+        if (g && o && !stappen[g]) {
+          const aansturing = {};
+          for (const [ci, name] of Object.entries(aansturingCols)) {
+            aansturing[name] = String(row[Number(ci)] || "").trim().toLowerCase() === "ja";
+          }
+          const link = String(row[16] || "").trim(); // kolom Q
+          stappen[g] = { titel: o, uitleg: String(row[15] || "").trim(), link: link || null, images: [], aansturing };
+        }
+      }
+      return { required_info, manuals, stappen };
+    }
+
+    // PNG bestanden kiezen
+    document.getElementById("admin-png-files").addEventListener("change", function () {
+      adminPngFiles = Array.from(this.files);
+      const listEl = document.getElementById("admin-png-list");
+      const btn    = document.getElementById("admin-png-upload-btn");
+      if (adminPngFiles.length) {
+        listEl.textContent = adminPngFiles.map(f => f.name).join(", ");
+        btn.disabled = false;
+        btn.textContent = `Uploaden (${adminPngFiles.length} bestand${adminPngFiles.length > 1 ? "en" : ""})`;
+      } else {
+        listEl.textContent = "";
+        btn.disabled = true;
+        btn.textContent = "Uploaden";
+      }
+      document.getElementById("admin-png-status").textContent = "";
+    });
+
+    // PNG's uploaden naar KV
+    document.getElementById("admin-png-upload-btn").addEventListener("click", async () => {
+      if (!adminPngFiles.length) return;
+      const statusEl = document.getElementById("admin-png-status");
+      statusEl.textContent = "Bezig met uploaden…";
+      const results = [];
+      for (const file of adminPngFiles) {
+        try {
+          const buf = await file.arrayBuffer();
+          const res = await fetch(`${TS_API}/admin/png`, {
+            method: "POST",
+            headers: { "Content-Type": "image/png", "X-Auth-Token": authToken, "X-Filename": file.name },
+            body: buf,
+          });
+          const d = await res.json();
+          if (res.ok) results.push({ name: file.name, ok: true,  info: `${Math.round(d.bytes / 1024)} KB${d.matrixPatched ? " · matrix bijgewerkt" : ""}` });
+          else        results.push({ name: file.name, ok: false, info: d.error || res.status });
+        } catch (err) {
+          results.push({ name: file.name, ok: false, info: err.message });
+        }
+      }
+      const okCount = results.filter(r => r.ok).length;
+      statusEl.innerHTML = results.map(r =>
+        `<div style="color:${r.ok ? "green" : "#c53030"}">${r.ok ? "✓" : "✗"} ${r.name} <span style="color:var(--muted)">(${r.info})</span></div>`
+      ).join("") + `<div style="margin-top:6px;font-weight:600">${okCount} van ${results.length} gelukt</div>`;
+    });
+
+    // ── Reset knop: ook troubleshoot en admin resetten ───────────────────────
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      const tsActive    = document.getElementById("tab-troubleshoot").classList.contains("active");
+      const manActive   = document.getElementById("tab-handleiding").classList.contains("active");
+      const adminActive = document.getElementById("tab-admin").classList.contains("active");
+
+      if (tsActive) {
+        tsMatrix = null; tsControl = null; tsComplaint = null; tsCauses = []; tsStep = 0;
+        document.getElementById("ts-component").value = "";
+        tsRender(`<div class="ts-loading">${tsT().start}</div>`);
+      }
+
+      if (manActive) {
+        manMergedData = null; manLoaded = false;
+        manControl = null; manCurrentManual = null; manCurrentSteps = []; manStep = 0;
+        manLoad();
+        manLoaded = true;
+      }
+
+      if (adminActive) {
+        // Formulierstatus wissen
+        adminParsedMatrix  = null;
+        adminPngFiles      = [];
+
+        // Matrix-sectie wissen
+        document.getElementById("admin-excel-name").textContent       = "";
+        document.getElementById("admin-matrix-preview").textContent   = "";
+        document.getElementById("admin-matrix-status").textContent    = "";
+        document.getElementById("admin-parse-btn").disabled           = true;
+        document.getElementById("admin-matrix-upload-btn").disabled   = true;
+        document.getElementById("admin-excel-file").value             = "";
+
+        // PNG-sectie wissen
+        document.getElementById("admin-png-list").textContent         = "";
+        document.getElementById("admin-png-status").textContent       = "";
+        document.getElementById("admin-png-upload-btn").disabled      = true;
+        document.getElementById("admin-png-upload-btn").textContent   = "Uploaden";
+        document.getElementById("admin-png-files").value              = "";
+
+        adminParsedManual = null;
+
+        // Logs-sectie wissen
+        document.getElementById("admin-logs-status").textContent  = "";
+        document.getElementById("admin-logs-display").innerHTML   = "";
+      }
+    });
+
+    // ── LOG's ophalen ────────────────────────────────────────────────────────
+    document.getElementById("admin-logs-fetch-btn").addEventListener("click", async () => {
+      const statusEl  = document.getElementById("admin-logs-status");
+      const displayEl = document.getElementById("admin-logs-display");
+      statusEl.textContent = "Ophalen...";
+      displayEl.innerHTML  = "";
+      try {
+        const res  = await fetch(`${TS_API}/admin/logs`, { headers: { "X-Auth-Token": authToken } });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Fout bij ophalen");
+        statusEl.textContent = `${data.count} log${data.count !== 1 ? "s" : ""} gevonden`;
+        if (!data.logs.length) {
+          displayEl.innerHTML = "<p style='padding:8px;color:var(--muted)'>Geen logs beschikbaar.</p>";
+        } else {
+          displayEl.innerHTML = data.logs.map(l => `
+            <div style="border-bottom:1px solid var(--border);padding:10px 0;">
+              <div style="color:var(--muted);font-size:0.78rem;margin-bottom:4px;">
+                🕐 ${l.ts ? new Date(l.ts).toLocaleString("nl-BE") : "?"}
+                &nbsp;·&nbsp; 🌐 ${l.lang || "?"}
+              </div>
+              <div style="margin-bottom:4px;"><strong>❓ Vraag:</strong> ${escHtml(l.query || "")}</div>
+              <div><strong>💬 Antwoord:</strong> ${escHtml(l.answer || "")}</div>
+            </div>
+          `).join("");
+        }
+      } catch (e) {
+        statusEl.textContent = `Fout: ${e.message}`;
+      }
+    });
+
+    // ── LOG's resetten ───────────────────────────────────────────────────────
+    document.getElementById("admin-logs-reset-btn").addEventListener("click", async () => {
+      if (!confirm("Alle logs permanent verwijderen?")) return;
+      const statusEl = document.getElementById("admin-logs-status");
+      statusEl.textContent = "Resetten...";
+      try {
+        const res  = await fetch(`${TS_API}/admin/logs-reset`, { method: "POST", headers: { "X-Auth-Token": authToken } });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Fout bij resetten");
+        statusEl.textContent = `✓ ${data.deleted} log${data.deleted !== 1 ? "s" : ""} verwijderd.`;
+        document.getElementById("admin-logs-display").innerHTML = "";
+      } catch (e) {
+        statusEl.textContent = `Fout: ${e.message}`;
+      }
+    });
+
+    // ── Debug LOGS KV ────────────────────────────────────────────────────────
+    document.getElementById("admin-logs-debug-btn").addEventListener("click", async () => {
+      const statusEl = document.getElementById("admin-logs-status");
+      statusEl.textContent = "Debug bezig...";
+      try {
+        const res  = await fetch(`${TS_API}/admin/logs-debug`, { method: "POST", headers: { "X-Auth-Token": authToken } });
+        const data = await res.json();
+        statusEl.innerHTML = `<pre style="font-size:0.78rem;white-space:pre-wrap">${JSON.stringify(data, null, 2)}</pre>`;
+      } catch (e) {
+        statusEl.textContent = `Debug fout: ${e.message}`;
+      }
+    });
+
+    // ── Handleiding tab ───────────────────────────────────────────────────────
+    const manLabels = {
+      nl: { loading:"Handleiding laden…", chooseManual:"Kies een handleiding",
+            stepOf:(n,t)=>`Stap ${n} van ${t}`, btnPrev:"← Vorige", btnNext:"Volgende →",
+            btnFinish:"✓ Klaar", btnBack:"← Terug",
+            noManual:"Geen handleidingen beschikbaar.",
+            tabHandleiding:"Handleiding",
+            linkText:"Zie link voor meer uitleg", doneTitle:"Einde handleiding", restart:"Opnieuw starten" },
+      fr: { loading:"Chargement du manuel…", chooseManual:"Choisissez un manuel",
+            stepOf:(n,t)=>`Étape ${n} sur ${t}`, btnPrev:"← Précédent", btnNext:"Suivant →",
+            btnFinish:"✓ Terminé", btnBack:"← Retour",
+            noManual:"Aucun manuel disponible.", tabHandleiding:"Manuel",
+            linkText:"Voir le lien pour plus d'informations", doneTitle:"Fin du manuel", restart:"Recommencer" },
+      en: { loading:"Loading manual…", chooseManual:"Choose a manual",
+            stepOf:(n,t)=>`Step ${n} of ${t}`, btnPrev:"← Previous", btnNext:"Next →",
+            btnFinish:"✓ Done", btnBack:"← Back",
+            noManual:"No manuals available.", tabHandleiding:"Manual",
+            linkText:"See link for more information", doneTitle:"End of manual", restart:"Start over" },
+      de: { loading:"Handbuch laden…", chooseManual:"Wählen Sie ein Handbuch",
+            stepOf:(n,t)=>`Schritt ${n} von ${t}`, btnPrev:"← Zurück", btnNext:"Weiter →",
+            btnFinish:"✓ Fertig", btnBack:"← Zurück",
+            noManual:"Keine Handbücher verfügbar.", tabHandleiding:"Handbuch",
+            linkText:"Siehe Link für weitere Informationen", doneTitle:"Ende des Handbuchs", restart:"Neu starten" },
+      es: { loading:"Cargando manual…", chooseManual:"Elija un manual",
+            stepOf:(n,t)=>`Paso ${n} de ${t}`, btnPrev:"← Anterior", btnNext:"Siguiente →",
+            btnFinish:"✓ Listo", btnBack:"← Volver",
+            noManual:"No hay manuales disponibles.", tabHandleiding:"Manual",
+            linkText:"Ver enlace para más información", doneTitle:"Fin del manual", restart:"Reiniciar" },
+      it: { loading:"Caricamento manuale…", chooseManual:"Scegliere un manuale",
+            stepOf:(n,t)=>`Passo ${n} di ${t}`, btnPrev:"← Precedente", btnNext:"Successivo →",
+            btnFinish:"✓ Fatto", btnBack:"← Indietro",
+            noManual:"Nessun manuale disponibile.", tabHandleiding:"Manuale",
+            linkText:"Vedi link per ulteriori informazioni", doneTitle:"Fine del manuale", restart:"Ricominciare" },
+    };
+
+    function manT() {
+      const l = (document.getElementById("language").value || "auto");
+      const code = l === "auto" ? (navigator.language || "nl").slice(0,2) : l;
+      return manLabels[code] || manLabels.nl;
+    }
+
+    // Merged state: alle componenten samengevat
+    let manMergedData = null;   // { options:[], manuals:[{id,naam,stappen,source}], sources:[] }
+    let manControl = null, manCurrentManual = null, manCurrentSteps = [], manStep = 0;
+    const manApp = () => document.getElementById("man-app");
+    function manRender(html) { manApp().innerHTML = html; }
+    function manCard(title, body) { return `<div class="ts-card"><h2>${title}</h2>${body}</div>`; }
+
+    function manShowControl() {
+      if (!manMergedData || !manMergedData.options.length) {
+        manRender(`<div class="ts-card"><div class="ts-error">${manT().noManual}</div></div>`); return;
+      }
+      // Vraag ophalen uit de eerste beschikbare bron
+      const vraag = manMergedData.sources[0]?.required_info?.[0]?.vraag || "Type aansturing";
+      const btns = manMergedData.options.map((opt, i) => `<button class="ts-btn" data-idx="${i}">${opt}</button>`).join("");
+      manRender(manCard(vraag, `<div class="ts-btn-list">${btns}</div>`));
+      manApp().querySelectorAll(".ts-btn").forEach((btn, i) => {
+        btn.addEventListener("click", () => { manControl = manMergedData.options[i]; manShowManuals(); });
+      });
+    }
+
+    function manShowManuals() {
+      const list = manMergedData.manuals.filter(m =>
+        m.stappen.some(id => {
+          const s = m.source.stappen[id];
+          return s && s.aansturing && s.aansturing[manControl];
+        })
+      );
+      let btns = list.map((m, i) => `<button class="ts-btn" data-idx="${i}">${m.naam}</button>`).join("");
+      if (!btns) btns = `<div class="ts-loading">${manT().noManual}</div>`;
+      manRender(manCard(manT().chooseManual, `<div class="ts-btn-list">${btns}</div>`));
+      manApp().querySelectorAll(".ts-btn").forEach((btn, i) => {
+        btn.addEventListener("click", () => {
+          manCurrentManual = list[i];
+          manCurrentSteps = manCurrentManual.stappen.filter(id => {
+            const s = manCurrentManual.source.stappen[id];
+            return s && s.aansturing && s.aansturing[manControl];
+          });
+          manStep = 0;
+          manShowStep();
+        });
+      });
+    }
+
+    function manShowStep() {
+      if (manStep >= manCurrentSteps.length) { manShowDone(); return; }
+      const stepId = manCurrentSteps[manStep];
+      const step   = manCurrentManual.source.stappen[stepId];
+      const n = manStep + 1, total = manCurrentSteps.length;
+      const isLast = manStep === total - 1;
+      const linkHtml = step.link
+        ? `<div class="ts-step-link"><a href="${step.link}" target="_blank" rel="noopener noreferrer">${manT().linkText}</a></div>` : "";
+      const imagesHtml = (step.images && step.images.length)
+        ? `<div class="ts-step-images">${step.images.map(f => `<img src="${TS_API}/png/${encodeURIComponent(f)}" alt="${f}" class="ts-step-img" loading="lazy" />`).join("")}</div>` : "";
+      manRender(`<div class="ts-card">
+        <div class="ts-step-header">
+          <div class="ts-step-badge">${manT().stepOf(n, total)}</div>
+          <div class="ts-action-row">
+            <button class="ts-btn secondary ts-btn-sm" id="man-prev">${manT().btnPrev}</button>
+            ${isLast
+              ? `<button class="ts-btn primary ts-btn-sm" id="man-finish">${manT().btnFinish}</button>`
+              : `<button class="ts-btn primary ts-btn-sm" id="man-next">${manT().btnNext}</button>`}
+          </div>
+        </div>
+        <div class="ts-complaint-label">${manCurrentManual.naam}</div>
+        <div class="ts-step-field"><strong>${step.titel}</strong></div>
+        ${step.uitleg ? `<div class="ts-step-field">${step.uitleg}</div>` : ""}
+        ${imagesHtml}${linkHtml}
+      </div>`);
+      const prevEl = document.getElementById("man-prev");
+      if (prevEl) prevEl.addEventListener("click", () => { if (manStep === 0) manShowManuals(); else { manStep--; manShowStep(); } });
+      const nextEl = document.getElementById("man-next");
+      if (nextEl) nextEl.addEventListener("click", () => { manStep++; manShowStep(); });
+      const finEl  = document.getElementById("man-finish");
+      if (finEl)  finEl.addEventListener("click", manShowDone);
+    }
+
+    function manShowDone() {
+      manRender(`<div class="ts-card ts-done">
+        <h2>${manT().doneTitle}</h2>
+        <button class="ts-btn primary" id="man-restart">${manT().restart}</button>
+      </div>`);
+      document.getElementById("man-restart").addEventListener("click", manReset);
+    }
+
+    function manReset() {
+      manControl = null; manCurrentManual = null; manCurrentSteps = []; manStep = 0;
+      if (manMergedData) manShowControl();
+    }
+
+    async function manLoad() {
+      const lang = (document.getElementById("language").value || "auto");
+      const langCode = lang === "auto" ? (navigator.language || "nl").slice(0,2) : lang;
+      manRender(`<div class="ts-loading">${manT().loading}</div>`);
+
+      try {
+        const res = await fetch(`${TS_API}/manual?language=${langCode}`);
+        if (!res.ok) throw new Error(res.status);
+        const src = await res.json();
+
+        const optionSet = new Set();
+        for (const ri of src.required_info || []) {
+          for (const opt of ri.opties || []) optionSet.add(opt);
+        }
+        const allManuals = Object.entries(src.manuals || {})
+          .filter(([, m]) => m.naam && m.stappen && m.stappen.length)
+          .map(([id, m]) => ({ id, naam: m.naam, stappen: m.stappen, source: src }));
+
+        manMergedData = { options: Array.from(optionSet), manuals: allManuals, sources: [src] };
+        manControl = null; manCurrentManual = null; manCurrentSteps = []; manStep = 0;
+        manShowControl();
+      } catch {
+        manRender(`<div class="ts-card"><div class="ts-error">${manT().noManual}</div></div>`);
+      }
+    }
+
+    function manUpdateTabLabel() {
+      document.getElementById("tab-btn-handleiding").textContent = manT().tabHandleiding;
+    }
+
+    manUpdateTabLabel();
+
+    // Auto-load bij eerste klik op Handleiding tab
+    let manLoaded = false;
+    document.querySelector('[data-tab="handleiding"]').addEventListener("click", () => {
+      if (!manLoaded) { manLoaded = true; manLoad(); }
+    });
+
+    document.getElementById("language").addEventListener("change", () => {
+      manUpdateTabLabel();
+      if (manLoaded) { manMergedData = null; manLoaded = false; manLoad(); manLoaded = true; }
+    });
+
+    function escHtml(str) {
+      return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+
+    // ── Microfoon / Whisper spraakherkenning ─────────────────────────────────
+    (function () {
+      const micBtn  = document.getElementById("micBtn");
+      const inputEl = document.getElementById("input");
+      let mediaRecorder = null;
+      let audioChunks   = [];
+      let recording     = false;
+
+      if (!navigator.mediaDevices || !window.MediaRecorder) {
+        micBtn.style.display = "none"; // browser ondersteunt geen opname
+        return;
+      }
+
+      function getLang() {
+        const l = (document.getElementById("language").value || "auto");
+        return l === "auto" ? (navigator.language || "nl").slice(0, 2) : l;
+      }
+
+      function getMimeType() {
+        const types = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg;codecs=opus"];
+        return types.find(t => MediaRecorder.isTypeSupported(t)) || "";
+      }
+
+      async function startRecording() {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          const mimeType = getMimeType();
+          mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+          audioChunks = [];
+          mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+          mediaRecorder.onstop = async () => {
+            stream.getTracks().forEach(t => t.stop());
+            const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || "audio/webm" });
+            micBtn.textContent = "⏳";
+            micBtn.disabled = true;
+            try {
+              const lang = getLang();
+              const res  = await fetch(`${TS_API}/transcribe?language=${lang}`, {
+                method: "POST",
+                headers: { "Content-Type": blob.type },
+                body: blob,
+              });
+              const data = await res.json();
+              if (data.text) {
+                inputEl.value = (inputEl.value ? inputEl.value + " " : "") + data.text.trim();
+                inputEl.focus();
+              }
+            } catch (e) {
+              console.error("Transcriptie mislukt:", e);
+            } finally {
+              micBtn.textContent = "🎤";
+              micBtn.disabled = false;
+              recording = false;
+            }
+          };
+          mediaRecorder.start();
+          recording = true;
+          micBtn.textContent = "⏹";
+          micBtn.classList.add("mic-recording");
+        } catch (e) {
+          console.error("Microfoon toegang geweigerd:", e);
+        }
+      }
+
+      function stopRecording() {
+        if (mediaRecorder && mediaRecorder.state !== "inactive") {
+          mediaRecorder.stop();
+          micBtn.classList.remove("mic-recording");
+        }
+      }
+
+      micBtn.addEventListener("click", () => {
+        if (recording) stopRecording();
+        else startRecording();
+      });
+    })();
+    </script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    }
+  </script>
+  </body>
+</html>
