@@ -1,0 +1,2 @@
+cd "C:\Users\gwennv\OneDrive - WINSOL\_Gwenn\DOCS\AI\SOCRATES_WEB_DEV\frontend"
+git add -A && git commit -m "update" && git push
