@@ -32,10 +32,11 @@
           </div>
           <label class="login-remember">
             <input type="checkbox" id="login-remember" />
-            Blijf aangemeld
+            <span id="login-remember-label">Blijf aangemeld</span>
           </label>
           <button class="primary login-btn" id="login-submit-btn">Aanmelden</button>
           <div id="login-error" class="login-error"></div>
+          <div id="login-contact" class="login-contact">Indien nog geen login, neem contact op met <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a></div>
         </div>
       </div>
     </div>
@@ -444,6 +445,31 @@
     }
 
     // ── Login scherm ─────────────────────────────────────────────────────────
+    // ── Login vertalingen ────────────────────────────────────────────────────
+    const loginLabels = {
+      nl: { user:"Gebruikersnaam", pw:"Wachtwoord", remember:"Blijf aangemeld", btn:"Aanmelden",
+            contact:'Indien nog geen login, neem contact op met <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>' },
+      fr: { user:"Nom d'utilisateur", pw:"Mot de passe", remember:"Rester connecté", btn:"Se connecter",
+            contact:'Si vous n\'avez pas encore de compte, contactez <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>' },
+      en: { user:"Username", pw:"Password", remember:"Stay signed in", btn:"Sign in",
+            contact:'No login yet? Contact <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>' },
+      de: { user:"Benutzername", pw:"Passwort", remember:"Angemeldet bleiben", btn:"Anmelden",
+            contact:'Noch kein Login? Kontaktieren Sie <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>' },
+      es: { user:"Usuario", pw:"Contraseña", remember:"Permanecer conectado", btn:"Iniciar sesión",
+            contact:'¿Sin acceso aún? Contacte <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>' },
+      it: { user:"Nome utente", pw:"Password", remember:"Rimani connesso", btn:"Accedi",
+            contact:'Nessun accesso? Contatta <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>' },
+    };
+    (function applyLoginLang() {
+      const code = (navigator.language || "nl").slice(0, 2).toLowerCase();
+      const l = loginLabels[code] || loginLabels.nl;
+      document.getElementById("login-username").placeholder    = l.user;
+      document.getElementById("login-password").placeholder    = l.pw;
+      document.getElementById("login-remember-label").textContent = l.remember;
+      document.getElementById("login-submit-btn").textContent  = l.btn;
+      document.getElementById("login-contact").innerHTML       = l.contact;
+    })();
+
     document.getElementById("login-submit-btn").addEventListener("click", doLogin);
     document.getElementById("login-password").addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
     document.getElementById("login-username").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("login-password").focus(); });

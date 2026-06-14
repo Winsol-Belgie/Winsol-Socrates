@@ -101,6 +101,16 @@
 }
 .login-pw-eye:hover { color: var(--text, #111); background: none; }
 
+.login-contact {
+  font-size: 0.8rem;
+  color: var(--muted, #6b7280);
+  text-align: center;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+.login-contact a { color: var(--muted, #6b7280); text-decoration: underline; }
+.login-contact a:hover { color: var(--text, #111); }
+
 .login-error {
   color: #c53030;
   font-size: 0.85rem;
