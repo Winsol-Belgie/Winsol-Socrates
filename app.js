@@ -181,9 +181,10 @@ async function send() {
 
     // Log vraag + antwoord naar LOGS KV (fire-and-forget)
     const logBase = API_URL.replace(/\/ask$/, "");
+    const authToken = localStorage.getItem("socrates_token") || "";
     fetch(`${logBase}/log`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "X-Auth-Token": authToken },
       body: JSON.stringify({ query: q, answer: assistantText, lang: uiLang }),
     }).catch(() => {});
   } catch (e) {

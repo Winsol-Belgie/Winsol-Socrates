@@ -926,6 +926,7 @@
               <div style="color:var(--muted);font-size:0.78rem;margin-bottom:4px;">
                 🕐 ${l.ts ? new Date(l.ts).toLocaleString("nl-BE") : "?"}
                 &nbsp;·&nbsp; 🌐 ${l.lang || "?"}
+                &nbsp;·&nbsp; 👤 ${escHtml(l.username || "—")}
               </div>
               <div style="margin-bottom:4px;"><strong>❓ Vraag:</strong> ${escHtml(l.query || "")}</div>
               <div><strong>💬 Antwoord:</strong> ${escHtml(l.answer || "")}</div>
