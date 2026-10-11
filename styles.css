@@ -1,139 +1,35 @@
-/* ===== Login scherm ===== */
-#login-screen {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f7f7f8;
-  z-index: 1000;
-  padding: 16px;
-}
-.login-card {
-  background: #fff;
-  border: 1px solid var(--border, #e5e5e9);
-  border-radius: 16px;
-  padding: 36px 32px 32px;
-  max-width: 380px;
-  width: 100%;
-  box-shadow: 0 4px 24px rgba(0,0,0,.08);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
-}
-.login-logo {
-  height: 80px;
-  width: auto;
-  object-fit: contain;
-  margin-bottom: 16px;
-}
-.login-title {
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin: 0 0 24px;
-  text-align: center;
-  color: var(--text, #111);
-}
-.login-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: 100%;
-}
-.login-form input[type="text"],
-.login-form input[type="password"] {
-  padding: 10px 14px;
-  border: 1px solid var(--border, #e5e5e9);
-  border-radius: 8px;
-  font-size: 1rem;
-  width: 100%;
-  box-sizing: border-box;
-  background: #fff;
-  color: var(--text, #111);
-}
-.login-form input:focus {
-  outline: 2px solid var(--brand, #FFD500);
-  border-color: var(--brand, #FFD500);
-}
-.login-remember {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.9rem;
-  color: var(--muted, #6b7280);
-  cursor: pointer;
-  user-select: none;
-}
-.login-remember input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  accent-color: var(--brand, #FFD500);
-}
-.login-btn {
-  width: 100%;
-  padding: 12px;
-  font-size: 1rem;
-  font-weight: 700;
-  margin-top: 4px;
-}
-.login-guest-btn {
-  width: 100%;
-  padding: 10px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  background: #f0f0f2;
-  color: var(--muted, #6b7280);
-  border: 1px solid var(--border, #e5e5e9);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.15s;
-  margin-top: -4px;
-}
-.login-guest-btn:hover {
-  background: #e2e2e6;
-  color: var(--text, #111);
-}
-.login-pw-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-.login-pw-wrap input {
-  flex: 1;
-  padding-right: 44px !important;
-}
-.login-pw-eye {
-  position: absolute;
-  right: 10px;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  color: var(--muted, #6b7280);
-  display: flex;
-  align-items: center;
-  line-height: 1;
-}
-.login-pw-eye:hover { color: var(--text, #111); background: none; }
+/* ===== Login scherm — identiek aan Presentatievertaler / Meeting Report Generator ===== */
+#login-screen { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; box-sizing:border-box; background:#f7f7f8; }
+.login-card { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:32px 28px; max-width:360px; width:100%; text-align:center; box-shadow:0 4px 24px rgba(0,0,0,.08); }
+.login-card .login-logo { width:56px; height:56px; object-fit:contain; margin-bottom:12px; }
+.login-card h1 { font-size:20px; margin:0 0 4px; color:var(--text); }
+.login-card .login-sub { color:var(--muted); font-size:13px; margin:0 0 20px; }
+.login-form { display:flex; flex-direction:column; gap:12px; text-align:left; }
+.login-form input[type=text], .login-form input[type=password] { width:100%; box-sizing:border-box; border:1px solid var(--border); border-radius:9px; padding:10px 12px; font-family:inherit; font-size:14px; background:#f7f7f8; color:var(--text); }
+.login-form input:focus { outline:2px solid var(--brand); outline-offset:1px; }
+.login-pw-wrap { position:relative; }
+.login-pw-wrap input { padding-right:38px !important; }
+.login-pw-eye { position:absolute; right:6px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; color:var(--muted); font-size:16px; padding:4px; }
+.login-pw-eye:hover { background:none; color:var(--text); }
+.login-remember { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); cursor:pointer; }
+.login-remember input { margin:0; }
+.login-btn { width:100%; }
+.login-error { color:#c00; font-size:13px; min-height:16px; }
 
-.login-contact {
-  font-size: 0.8rem;
-  color: var(--muted, #6b7280);
-  text-align: center;
-  margin-top: 4px;
-  line-height: 1.4;
-}
-.login-contact a { color: var(--muted, #6b7280); text-decoration: underline; }
-.login-contact a:hover { color: var(--text, #111); }
+/* Login-taalkeuze (onder de kaart-inhoud, gecentreerd) */
+.login-lang { display:flex; align-items:center; justify-content:center; gap:8px; margin-top:18px; }
+.login-lang .lang-icon { width:20px; height:20px; fill:var(--muted); flex-shrink:0; }
+.login-lang .language-wrapper select { appearance:none; -webkit-appearance:none; font-family:inherit; font-size:13px; padding:6px 32px 6px 12px; border:1px solid var(--border); border-radius:8px; background:#fff; color:var(--text); height:32px; cursor:pointer; }
+.login-lang .language-wrapper select:hover { border-color:var(--muted); }
+.login-lang .language-wrapper select:focus { outline:2px solid var(--brand); outline-offset:1px; }
+.login-lang .language-wrapper::after { right:12px; border-left:5px solid transparent; border-right:5px solid transparent; border-top:6px solid var(--muted); }
 
-.login-error {
-  color: #c53030;
-  font-size: 0.85rem;
-  min-height: 1.2em;
-  text-align: center;
-}
+/* SO!Crates-specifiek: gast-knop + contacttekst */
+.login-guest-btn { width:100%; background:#f0f0f2; color:var(--muted); border:1px solid var(--border); font-weight:600; }
+.login-guest-btn:hover { background:#e2e2e6; color:var(--text); }
+.login-contact { font-size:12px; color:var(--muted); text-align:center; line-height:1.4; }
+.login-contact a { color:var(--muted); text-decoration:underline; }
+.login-contact a:hover { color:var(--text); }
 
 /* ===== Hero gebruiker + uitlogknop ===== */
 .hero__user {

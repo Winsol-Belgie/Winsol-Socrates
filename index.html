@@ -19,25 +19,37 @@
     <!-- ── LOGIN SCHERM ──────────────────────────────────────────────────── -->
     <div id="login-screen" style="display:none;">
       <div class="login-card">
-        <img src="SO-Crates_Logo_mini.png" alt="SO!Crates logo" class="login-logo" />
-        <h1 class="login-title">Winsol SO!Crates</h1>
+        <img src="SO-Crates_Logo_mini.png" alt="SO!Crates" class="login-logo" />
+        <h1>Winsol SO!Crates</h1>
+        <p class="login-sub" id="login-sub">Log in om verder te gaan.</p>
         <div class="login-form">
           <input type="text" id="login-username" placeholder="Gebruikersnaam" autocomplete="username" />
           <div class="login-pw-wrap">
             <input type="password" id="login-password" placeholder="Wachtwoord" autocomplete="current-password" />
-            <button type="button" id="login-pw-toggle" class="login-pw-eye" title="Wachtwoord tonen/verbergen" tabindex="-1">
-              <svg id="eye-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              <svg id="eye-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-            </button>
+            <button type="button" id="login-pw-toggle" class="login-pw-eye" title="Wachtwoord tonen/verbergen" tabindex="-1">&#128065;</button>
           </div>
           <label class="login-remember">
             <input type="checkbox" id="login-remember" />
             <span id="login-remember-label">Blijf aangemeld</span>
           </label>
-          <button class="primary login-btn" id="login-submit-btn">Aanmelden</button>
+          <button class="login-btn" id="login-submit-btn" type="button">Aanmelden</button>
           <div id="login-error" class="login-error"></div>
-          <button class="login-guest-btn" id="login-guest-btn">Ga verder zonder login</button>
+          <button class="login-guest-btn" id="login-guest-btn" type="button">Ga verder zonder login</button>
           <div id="login-contact" class="login-contact">Indien nog geen login, neem contact op met <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a></div>
+        </div>
+        <div class="language-box login-lang">
+          <svg class="lang-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm7.93 9h-3.05a15.1 15.1 0 00-1.12-5.18 8.03 8.03 0 014.17 5.18zM12 4c.88 1.14 1.57 2.71 1.97 4.5H10.03C10.43 6.71 11.12 5.14 12 4zm-3.76.82A15.1 15.1 0 006.12 11H3.07a8.03 8.03 0 015.17-6.18zM3.07 13h3.05a15.1 15.1 0 001.12 5.18A8.03 8.03 0 013.07 13zm8.93 7c-.88-1.14-1.57-2.71-1.97-4.5h3.94c-.4 1.79-1.09 3.36-1.97 4.5zm3.76-.82a15.1 15.1 0 001.12-5.18h3.05a8.03 8.03 0 01-4.17 5.18z"/></svg>
+          <div class="language-wrapper">
+            <select id="login-lang">
+              <option value="auto" selected>Automatisch</option>
+              <option value="nl">Nederlands</option>
+              <option value="fr">Français</option>
+              <option value="en">English</option>
+              <option value="de">Deutsch</option>
+              <option value="es">Español</option>
+              <option value="it">Italiano</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
@@ -481,29 +493,47 @@
     // ── Login scherm ─────────────────────────────────────────────────────────
     // ── Login vertalingen ────────────────────────────────────────────────────
     const loginLabels = {
-      nl: { user:"Gebruikersnaam", pw:"Wachtwoord", remember:"Blijf aangemeld", btn:"Aanmelden", guest:"Ga verder zonder login",
+      nl: { sub:"Log in om verder te gaan.", user:"Gebruikersnaam", pw:"Wachtwoord", remember:"Blijf aangemeld", btn:"Aanmelden", guest:"Ga verder zonder login", auto:"Automatisch",
             contact:'Indien nog geen login, neem contact op met <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>' },
-      fr: { user:"Nom d'utilisateur", pw:"Mot de passe", remember:"Rester connecté", btn:"Se connecter", guest:"Continuer sans connexion",
+      fr: { sub:"Connectez-vous pour continuer.", user:"Nom d'utilisateur", pw:"Mot de passe", remember:"Rester connecté", btn:"Se connecter", guest:"Continuer sans connexion", auto:"Automatique",
             contact:'Si vous n\'avez pas encore de compte, contactez <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>' },
-      en: { user:"Username", pw:"Password", remember:"Stay signed in", btn:"Sign in", guest:"Continue without login",
+      en: { sub:"Sign in to continue.", user:"Username", pw:"Password", remember:"Stay signed in", btn:"Sign in", guest:"Continue without login", auto:"Automatic",
             contact:'No login yet? Contact <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>' },
-      de: { user:"Benutzername", pw:"Passwort", remember:"Angemeldet bleiben", btn:"Anmelden", guest:"Ohne Anmeldung fortfahren",
+      de: { sub:"Melden Sie sich an, um fortzufahren.", user:"Benutzername", pw:"Passwort", remember:"Angemeldet bleiben", btn:"Anmelden", guest:"Ohne Anmeldung fortfahren", auto:"Automatisch",
             contact:'Noch kein Login? Kontaktieren Sie <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>' },
-      es: { user:"Usuario", pw:"Contraseña", remember:"Permanecer conectado", btn:"Iniciar sesión", guest:"Continuar sin iniciar sesión",
+      es: { sub:"Inicie sesión para continuar.", user:"Usuario", pw:"Contraseña", remember:"Permanecer conectado", btn:"Iniciar sesión", guest:"Continuar sin iniciar sesión", auto:"Automático",
             contact:'¿Sin acceso aún? Contacte <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>' },
-      it: { user:"Nome utente", pw:"Password", remember:"Rimani connesso", btn:"Accedi", guest:"Continua senza accesso",
+      it: { sub:"Accedi per continuare.", user:"Nome utente", pw:"Password", remember:"Rimani connesso", btn:"Accedi", guest:"Continua senza accesso", auto:"Automatico",
             contact:'Nessun accesso? Contatta <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>' },
     };
-    (function applyLoginLang() {
-      const code = (navigator.language || "nl").slice(0, 2).toLowerCase();
-      const l = loginLabels[code] || loginLabels.nl;
-      document.getElementById("login-username").placeholder    = l.user;
-      document.getElementById("login-password").placeholder    = l.pw;
+    function loginLangCode() {
+      const v = document.getElementById("login-lang").value;
+      return v !== "auto" ? v : (navigator.language || "nl").slice(0, 2).toLowerCase();
+    }
+    function applyLoginLang() {
+      const l = loginLabels[loginLangCode()] || loginLabels.nl;
+      document.getElementById("login-sub").textContent           = l.sub;
+      document.getElementById("login-username").placeholder      = l.user;
+      document.getElementById("login-password").placeholder      = l.pw;
       document.getElementById("login-remember-label").textContent = l.remember;
-      document.getElementById("login-submit-btn").textContent  = l.btn;
-      document.getElementById("login-guest-btn").textContent   = l.guest;
-      document.getElementById("login-contact").innerHTML       = l.contact;
-    })();
+      document.getElementById("login-submit-btn").textContent    = l.btn;
+      document.getElementById("login-guest-btn").textContent     = l.guest;
+      document.getElementById("login-contact").innerHTML         = l.contact;
+      document.querySelector('#login-lang option[value="auto"]').textContent = l.auto;
+    }
+    applyLoginLang();
+    // Taalkeuze op loginscherm = ook taal van de app
+    document.getElementById("login-lang").addEventListener("change", e => {
+      applyLoginLang();
+      const appSel = document.getElementById("language");
+      appSel.value = e.target.value;
+      appSel.dispatchEvent(new Event("change"));
+    });
+    // En omgekeerd: taal in de app wijzigen → loginscherm volgt
+    document.getElementById("language").addEventListener("change", e => {
+      const loginSel = document.getElementById("login-lang");
+      if (loginSel.value !== e.target.value) { loginSel.value = e.target.value; applyLoginLang(); }
+    });
 
     document.getElementById("login-submit-btn").addEventListener("click", doLogin);
     document.getElementById("login-guest-btn").addEventListener("click", () => {
@@ -516,10 +546,7 @@
     document.getElementById("login-username").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("login-password").focus(); });
     document.getElementById("login-pw-toggle").addEventListener("click", () => {
       const pw = document.getElementById("login-password");
-      const isHidden = pw.type === "password";
-      pw.type = isHidden ? "text" : "password";
-      document.getElementById("eye-open").style.display   = isHidden ? "none"  : "";
-      document.getElementById("eye-closed").style.display = isHidden ? ""      : "none";
+      pw.type = pw.type === "password" ? "text" : "password";
     });
 
     async function doLogin() {
@@ -550,7 +577,7 @@
         errEl.textContent = "Verbinding mislukt.";
       } finally {
         btn.disabled = false;
-        btn.textContent = "Aanmelden";
+        btn.textContent = (loginLabels[loginLangCode()] || loginLabels.nl).btn;
       }
     }
 
