@@ -44,36 +44,38 @@
 
     <main class="container" id="main-app" style="display:none;">
 
+      <!-- TOPBAR: taal links, gebruiker + uitloggen rechts -->
+      <div class="topbar">
+        <div class="language-box">
+          <svg class="lang-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm7.93 9h-3.05a15.1 15.1 0 00-1.12-5.18 8.03 8.03 0 014.17 5.18zM12 4c.88 1.14 1.57 2.71 1.97 4.5H10.03C10.43 6.71 11.12 5.14 12 4zm-3.76.82A15.1 15.1 0 006.12 11H3.07a8.03 8.03 0 015.17-6.18zM3.07 13h3.05a15.1 15.1 0 001.12 5.18A8.03 8.03 0 013.07 13zm8.93 7c-.88-1.14-1.57-2.71-1.97-4.5h3.94c-.4 1.79-1.09 3.36-1.97 4.5zm3.76-.82a15.1 15.1 0 001.12-5.18h3.05a8.03 8.03 0 01-4.17 5.18z"/></svg>
+          <div class="language-wrapper">
+            <select id="language">
+              <option value="auto" selected>Automatisch</option>
+              <option value="nl">Nederlands</option>
+              <option value="fr">Français</option>
+              <option value="en">English</option>
+              <option value="de">Deutsch</option>
+              <option value="es">Español</option>
+              <option value="it">Italiano</option>
+            </select>
+          </div>
+        </div>
+        <span id="topbar-userinfo"><span id="topbar-loggedin">Ingelogd als</span> <b id="hero-username"></b> (<span id="topbar-role"></span>)</span>
+        <button id="logoutBtn" class="btn-dark" type="button">Uitloggen</button>
+      </div>
+
       <!-- HERO -->
       <header class="hero" role="banner" aria-label="Winsol SO!Crates header">
         <div>
-          <h1 class="hero__title">Winsol SO!Crates (14-06-'26 v1)</h1>
-          <div class="hero__user">
-            <span id="hero-username" class="hero__username"></span>
-            <button id="logoutBtn" class="btn-secondary btn-logout" title="Afmelden">Afmelden</button>
-          </div>
+          <h1 class="hero__title">Winsol SO!Crates</h1>
         </div>
-        <img class="hero__logo" src="SO-Crates_Logo_mini.png" alt="SO!Crates logo" />
+        <img class="hero__logo" src="https://winsol-belgie.github.io/meeting-report-generator/Winsol_Avatar_150px.png" alt="Winsol" />
       </header>
 
       <!-- TOOLBAR -->
       <div class="toolbar">
         <div class="fields">
           <div class="language-box">
-            <div class="language-wrapper">
-              <select id="language">
-                <option value="auto" selected>Automatic</option>
-                <option value="nl">Nederlands</option>
-                <option value="fr">Français</option>
-                <option value="en">English</option>
-                <option value="de">Deutsch</option>
-                <option value="es">Español</option>
-                <option value="it">Italiano</option>
-              </select>
-            </div>
-            <svg class="lang-icon" viewBox="0 0 24 24">
-              <path fill="#555" d="M12 2a10 10 0 100 20 10 10 0 000-20zm7.93 9h-3.05a15.1 15.1 0 00-1.12-5.18 8.03 8.03 0 014.17 5.18zM12 4c.88 1.14 1.57 2.71 1.97 4.5H10.03C10.43 6.71 11.12 5.14 12 4zm-3.76.82A15.1 15.1 0 006.12 11H3.07a8.03 8.03 0 015.17-6.18zM3.07 13h3.05a15.1 15.1 0 001.12 5.18A8.03 8.03 0 013.07 13zm8.93 7c-.88-1.14-1.57-2.71-1.97-4.5h3.94c-.4 1.79-1.09 3.36-1.97 4.5zm3.76-.82a15.1 15.1 0 001.12-5.18h3.05a8.03 8.03 0 01-4.17 5.18z"/>
-            </svg>
             <button type="button" id="mailBtn" class="btn-secondary">Mail</button>
             <a id="pdfBtn" class="btn-secondary"
                href="https://winsolgroup.sharepoint.com/sites/SunprotectionAndOutdoorLiving/PublishedDocuments/Forms/BIB%20RD.aspx?viewid=9bb1db15%2D1a0f%2D4455%2Db0b0%2D0d2356e1ea0c&id=%2Fsites%2FSunprotectionAndOutdoorLiving%2FPublishedDocuments%2FPRODUCTS%2FPERGOLA%2FSO%21%2FSO%21%5FSPECS%5F2025%2D00%2Epdf&parent=%2Fsites%2FSunprotectionAndOutdoorLiving%2FPublishedDocuments%2FPRODUCTS%2FPERGOLA%2FSO%21"
@@ -331,7 +333,7 @@
         : "";
       tsRender(`<div class="ts-card">
         <div class="ts-step-header">
-          <div class="ts-step-badge">${n} / ${total}</div>
+          <div class="section-title"><span class="step-badge">${n}</span><span class="step-of">/ ${total}</span></div>
           <div class="ts-action-row">
             <button class="ts-btn secondary ts-btn-sm" id="ts-prev" style="${tsStep === 0 ? 'visibility:hidden' : ''}">${tsT().prev}</button>
             <button class="ts-btn primary ts-btn-sm" id="ts-solved">${tsT().solved}</button>
@@ -436,9 +438,8 @@
       document.getElementById("main-app").style.display     = "block";
       const isGuest = (role === "guest");
       document.getElementById("hero-username").textContent = isGuest ? "" : username;
-      const logoutBtn = document.getElementById("logoutBtn");
-      logoutBtn.textContent = isGuest ? "Aanmelden" : "Afmelden";
-      logoutBtn.title       = isGuest ? "Aanmelden" : "Afmelden";
+      document.getElementById("topbar-userinfo").style.display = isGuest ? "none" : "";
+      applyTopbarLang();
       // Chat: enkel voor ingelogde users/admins
       document.getElementById("tab-btn-chat").style.display = isGuest ? "none" : "";
       // Admin: enkel voor admins
@@ -446,6 +447,26 @@
       // Starttab: gast → Probleemoplossing, anders → Chat
       activateTab(isGuest ? "troubleshoot" : "chat");
     }
+
+    // ── Topbar vertalingen ───────────────────────────────────────────────────
+    const topbarLabels = {
+      nl: { loggedIn:"Ingelogd als", user:"gebruiker", admin:"beheerder", logout:"Uitloggen", login:"Aanmelden", auto:"Automatisch" },
+      fr: { loggedIn:"Connecté en tant que", user:"utilisateur", admin:"administrateur", logout:"Se déconnecter", login:"Se connecter", auto:"Automatique" },
+      en: { loggedIn:"Signed in as", user:"user", admin:"admin", logout:"Sign out", login:"Sign in", auto:"Automatic" },
+      de: { loggedIn:"Angemeldet als", user:"Benutzer", admin:"Administrator", logout:"Abmelden", login:"Anmelden", auto:"Automatisch" },
+      es: { loggedIn:"Conectado como", user:"usuario", admin:"administrador", logout:"Cerrar sesión", login:"Iniciar sesión", auto:"Automático" },
+      it: { loggedIn:"Connesso come", user:"utente", admin:"amministratore", logout:"Esci", login:"Accedi", auto:"Automatico" },
+    };
+    function applyTopbarLang() {
+      const sel  = document.getElementById("language");
+      const code = (sel && sel.value !== "auto") ? sel.value : (navigator.language || "nl").slice(0, 2).toLowerCase();
+      const l = topbarLabels[code] || topbarLabels.nl;
+      document.getElementById("topbar-loggedin").textContent = l.loggedIn;
+      document.getElementById("topbar-role").textContent     = authRole === "admin" ? l.admin : l.user;
+      document.getElementById("logoutBtn").textContent       = authRole === "guest" ? l.login : l.logout;
+      if (sel) sel.querySelector('option[value="auto"]').textContent = l.auto;
+    }
+    document.getElementById("language").addEventListener("change", applyTopbarLang);
 
     function activateTab(name) {
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
@@ -1084,7 +1105,7 @@
         ? `<div class="ts-step-images">${step.images.map(f => `<img src="${TS_API}/png/${encodeURIComponent(f)}" alt="${f}" class="ts-step-img" loading="lazy" />`).join("")}</div>` : "";
       manRender(`<div class="ts-card">
         <div class="ts-step-header">
-          <div class="ts-step-badge">${manT().stepOf(n, total)}</div>
+          <div class="section-title"><span class="step-badge">${n}</span><span>${step.titel}</span><span class="step-of">${manT().stepOf(n, total)}</span></div>
           <div class="ts-action-row">
             <button class="ts-btn secondary ts-btn-sm" id="man-prev">${manT().btnPrev}</button>
             ${isLast
@@ -1093,7 +1114,6 @@
           </div>
         </div>
         <div class="ts-complaint-label">${manCurrentManual.naam}</div>
-        <div class="ts-step-field"><strong>${step.titel}</strong></div>
         ${step.uitleg ? `<div class="ts-step-field">${step.uitleg}</div>` : ""}
         ${imagesHtml}${linkHtml}
       </div>`);

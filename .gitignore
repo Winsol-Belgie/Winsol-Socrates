@@ -1,0 +1,4 @@
+# Nooit publiek zetten: bevat wachtwoorden
+USERS.xlsx
+USERS*.xlsx
+~$*.xlsx
