@@ -15,6 +15,8 @@
 .login-remember input { margin:0; }
 .login-btn { width:100%; }
 .login-error { color:#c00; font-size:13px; min-height:16px; }
+/* Lege foutmelding: ruimte tussen Aanmelden en gast-knop halveren (40px → 20px) */
+.login-error:empty { min-height:0; margin-top:-4px; }
 
 /* Login-taalkeuze (onder de kaart-inhoud, gecentreerd) */
 .login-lang { display:flex; align-items:center; justify-content:center; gap:8px; margin-top:18px; }
