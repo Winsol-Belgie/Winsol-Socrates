@@ -87,7 +87,7 @@
 
       <!-- TABS -->
       <div class="tabs">
-        <button class="tab-btn active" data-tab="chat">Chat</button>
+        <button class="tab-btn active" id="tab-btn-chat" data-tab="chat">Chat</button>
         <button class="tab-btn" id="tab-btn-troubleshoot" data-tab="troubleshoot">Probleemoplossing</button>
         <button class="tab-btn" id="tab-btn-handleiding" data-tab="handleiding">Handleiding</button>
         <button class="tab-btn" id="tab-btn-admin" data-tab="admin" style="display:none;">Admin</button>
@@ -439,9 +439,17 @@
       const logoutBtn = document.getElementById("logoutBtn");
       logoutBtn.textContent = isGuest ? "Aanmelden" : "Afmelden";
       logoutBtn.title       = isGuest ? "Aanmelden" : "Afmelden";
-      if (role === "admin") {
-        document.getElementById("tab-btn-admin").style.display = "";
-      }
+      // Chat: enkel voor ingelogde users/admins
+      document.getElementById("tab-btn-chat").style.display = isGuest ? "none" : "";
+      // Admin: enkel voor admins
+      document.getElementById("tab-btn-admin").style.display = (role === "admin") ? "" : "none";
+      // Starttab: gast → Probleemoplossing, anders → Chat
+      activateTab(isGuest ? "troubleshoot" : "chat");
+    }
+
+    function activateTab(name) {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
+      document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.id === "tab-" + name));
     }
 
     function showLogin() {
