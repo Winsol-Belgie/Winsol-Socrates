@@ -36,6 +36,7 @@
           </label>
           <button class="primary login-btn" id="login-submit-btn">Aanmelden</button>
           <div id="login-error" class="login-error"></div>
+          <button class="login-guest-btn" id="login-guest-btn">Ga verder zonder login</button>
           <div id="login-contact" class="login-contact">Indien nog geen login, neem contact op met <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a></div>
         </div>
       </div>
@@ -433,7 +434,11 @@
       authRole     = role;
       document.getElementById("login-screen").style.display = "none";
       document.getElementById("main-app").style.display     = "block";
-      document.getElementById("hero-username").textContent  = username;
+      const isGuest = (role === "guest");
+      document.getElementById("hero-username").textContent = isGuest ? "" : username;
+      const logoutBtn = document.getElementById("logoutBtn");
+      logoutBtn.textContent = isGuest ? "Aanmelden" : "Afmelden";
+      logoutBtn.title       = isGuest ? "Aanmelden" : "Afmelden";
       if (role === "admin") {
         document.getElementById("tab-btn-admin").style.display = "";
       }
@@ -447,17 +452,17 @@
     // ── Login scherm ─────────────────────────────────────────────────────────
     // ── Login vertalingen ────────────────────────────────────────────────────
     const loginLabels = {
-      nl: { user:"Gebruikersnaam", pw:"Wachtwoord", remember:"Blijf aangemeld", btn:"Aanmelden",
+      nl: { user:"Gebruikersnaam", pw:"Wachtwoord", remember:"Blijf aangemeld", btn:"Aanmelden", guest:"Ga verder zonder login",
             contact:'Indien nog geen login, neem contact op met <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>' },
-      fr: { user:"Nom d'utilisateur", pw:"Mot de passe", remember:"Rester connecté", btn:"Se connecter",
+      fr: { user:"Nom d'utilisateur", pw:"Mot de passe", remember:"Rester connecté", btn:"Se connecter", guest:"Continuer sans connexion",
             contact:'Si vous n\'avez pas encore de compte, contactez <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>' },
-      en: { user:"Username", pw:"Password", remember:"Stay signed in", btn:"Sign in",
+      en: { user:"Username", pw:"Password", remember:"Stay signed in", btn:"Sign in", guest:"Continue without login",
             contact:'No login yet? Contact <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>' },
-      de: { user:"Benutzername", pw:"Passwort", remember:"Angemeldet bleiben", btn:"Anmelden",
+      de: { user:"Benutzername", pw:"Passwort", remember:"Angemeldet bleiben", btn:"Anmelden", guest:"Ohne Anmeldung fortfahren",
             contact:'Noch kein Login? Kontaktieren Sie <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>' },
-      es: { user:"Usuario", pw:"Contraseña", remember:"Permanecer conectado", btn:"Iniciar sesión",
+      es: { user:"Usuario", pw:"Contraseña", remember:"Permanecer conectado", btn:"Iniciar sesión", guest:"Continuar sin iniciar sesión",
             contact:'¿Sin acceso aún? Contacte <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>' },
-      it: { user:"Nome utente", pw:"Password", remember:"Rimani connesso", btn:"Accedi",
+      it: { user:"Nome utente", pw:"Password", remember:"Rimani connesso", btn:"Accedi", guest:"Continua senza accesso",
             contact:'Nessun accesso? Contatta <a href="mailto:pergolasupport@winsol.eu">pergolasupport@winsol.eu</a>' },
     };
     (function applyLoginLang() {
@@ -467,10 +472,17 @@
       document.getElementById("login-password").placeholder    = l.pw;
       document.getElementById("login-remember-label").textContent = l.remember;
       document.getElementById("login-submit-btn").textContent  = l.btn;
+      document.getElementById("login-guest-btn").textContent   = l.guest;
       document.getElementById("login-contact").innerHTML       = l.contact;
     })();
 
     document.getElementById("login-submit-btn").addEventListener("click", doLogin);
+    document.getElementById("login-guest-btn").addEventListener("click", () => {
+      authToken    = null;
+      authUsername = null;
+      authRole     = "guest";
+      showApp("", "guest");
+    });
     document.getElementById("login-password").addEventListener("keydown", e => { if (e.key === "Enter") doLogin(); });
     document.getElementById("login-username").addEventListener("keydown", e => { if (e.key === "Enter") document.getElementById("login-password").focus(); });
     document.getElementById("login-pw-toggle").addEventListener("click", () => {
@@ -540,14 +552,15 @@
 
     // ── Uitloggen ────────────────────────────────────────────────────────────
     document.getElementById("logoutBtn").addEventListener("click", async () => {
-      if (authToken) {
+      // Gast: gewoon terug naar loginscherm, geen API-call nodig
+      if (authRole !== "guest" && authToken) {
         try { await fetch(`${TS_API}/logout`, { method: "POST", headers: { "X-Auth-Token": authToken } }); } catch {}
       }
       authToken    = null;
       authUsername = null;
       authRole     = null;
       localStorage.removeItem("socrates_token");
-      // Admin tab verbergen bij uitloggen
+      // Admin tab verbergen
       document.getElementById("tab-btn-admin").style.display = "none";
       // Zeker Chat tab activeren
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
