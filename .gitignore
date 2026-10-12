@@ -2,3 +2,6 @@
 USERS.xlsx
 USERS*.xlsx
 ~$*.xlsx
+
+# Interne documentatie (bevat accounts en zwakke punten) — niet publiek
+README.md

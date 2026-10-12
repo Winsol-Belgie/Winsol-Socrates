@@ -1251,7 +1251,7 @@
               const lang = getLang();
               const res  = await fetch(`${TS_API}/transcribe?language=${lang}`, {
                 method: "POST",
-                headers: { "Content-Type": blob.type },
+                headers: { "Content-Type": blob.type, "X-Auth-Token": localStorage.getItem("socrates_token") || "" },
                 body: blob,
               });
               const data = await res.json();

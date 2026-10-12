@@ -138,9 +138,10 @@ async function send() {
     showTypingIndicator();
     const res = await fetch(API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "X-Auth-Token": localStorage.getItem("socrates_token") || "" },
       body: JSON.stringify(body),
     });
+    if (res.status === 401) throw new Error("Sessie verlopen — meld opnieuw aan.");
     if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
     removeTypingIndicator();
 
