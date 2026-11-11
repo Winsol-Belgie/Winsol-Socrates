@@ -221,10 +221,20 @@
     // ── Tab switching ────────────────────────────────────────────────────────
     document.querySelectorAll(".tab-btn").forEach(btn => {
       btn.addEventListener("click", () => {
+        const wasActive = btn.classList.contains("active");
         document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
         document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
         btn.classList.add("active");
         document.getElementById("tab-" + btn.dataset.tab).classList.add("active");
+        // Nogmaals op de actieve tab klikken = terug naar het beginscherm van die tab
+        if (wasActive && btn.dataset.tab === "handleiding" && typeof manMergedData !== "undefined" && manMergedData) {
+          manReset();
+        }
+        if (wasActive && btn.dataset.tab === "troubleshoot") {
+          tsMatrix = null; tsControl = null; tsComplaint = null; tsCauses = []; tsStep = 0;
+          document.getElementById("ts-component").value = "";
+          tsRender(`<div class="ts-loading">${tsT().start}</div>`);
+        }
       });
     });
 
