@@ -683,10 +683,11 @@
             }
           } catch { /* niet-kritiek */ }
           adminParsedManual = manual;
+          const nP = manual.producten.length;
           const nM = Object.keys(manual.manuals).length;
           const nS = Object.keys(manual.stappen).length;
           const nL = Object.values(manual.stappen).filter(s => s.link).length;
-          preview.textContent = `✓ ${nM} handleidingen · ${nS} stappen · ${nL} links`;
+          preview.textContent = `✓ ${nP} producten · ${nM} handleidingen · ${nS} stappen · ${nL} links`;
         } else {
           // ── Matrix parser ──
           const matrix = adminParseExcel(rows, component);
@@ -849,40 +850,31 @@
     }
 
     function adminParseManualExcel(rows) {
-      const headerRow = rows[0] || [];
-      const dataRows  = rows.slice(1);
-      // Detecteer aansturing-kolommen uit de header (kolommen H-N = index 7-13)
-      const aansturingCols = {};
-      for (let i = 7; i <= 13; i++) {
-        const v = String(headerRow[i] || "").trim();
-        if (v) aansturingCols[i] = v;
-      }
-      const required_info = [], manuals = {}, stappen = {};
-      const seenRI = new Set();
-      for (const row of dataRows) {
-        const a = String(row[0] || "").trim();
+      // Structuur (sinds nov 2026):
+      //   A = productcode (MS..), B = productnaam, C = handleidingcodes (MP.., komma-gescheiden)
+      //   D = handleidingcode (MP..), E = naam handleiding, F = stapcodes (MC.., komma-gescheiden, in volgorde)
+      //   G = stapcode (MC..), "Stap" = titel, "Uitleg", "Link"
+      const headerRow = (rows[0] || []).map(v => String(v || "").trim().toLowerCase());
+      const colTitel  = headerRow.indexOf("stap")   >= 0 ? headerRow.indexOf("stap")   : 7;
+      const colUitleg = headerRow.indexOf("uitleg") >= 0 ? headerRow.indexOf("uitleg") : colTitel + 1;
+      const colLink   = headerRow.indexOf("link")   >= 0 ? headerRow.indexOf("link")   : colTitel + 2;
+      const splitCodes = v => String(v || "").split(/[,;]/).map(x => x.trim().toUpperCase()).filter(Boolean);
+      const producten = [], manuals = {}, stappen = {};
+      for (const row of rows.slice(1)) {
+        const a = String(row[0] || "").trim().toUpperCase();
         const b = String(row[1] || "").trim();
-        if (a && b && a.startsWith("MS") && !seenRI.has(a)) {
-          seenRI.add(a);
-          required_info.push({ id: a, vraag: b, opties: String(row[2] || "").split(",").map(s => s.trim()).filter(Boolean) });
-        }
-        const d = String(row[3] || "").trim();
+        if (a && b) producten.push({ id: a, naam: b, manuals: splitCodes(row[2]) });
+        const d = String(row[3] || "").trim().toUpperCase();
         const e = String(row[4] || "").trim();
-        if (d && e && !manuals[d]) {
-          manuals[d] = { naam: e, stappen: String(row[5] || "").split(",").map(s => s.trim()).filter(Boolean) };
-        }
-        const g = String(row[6] || "").trim();
-        const o = String(row[14] || "").trim();  // kolom O
-        if (g && o && !stappen[g]) {
-          const aansturing = {};
-          for (const [ci, name] of Object.entries(aansturingCols)) {
-            aansturing[name] = String(row[Number(ci)] || "").trim().toLowerCase() === "ja";
-          }
-          const link = String(row[16] || "").trim(); // kolom Q
-          stappen[g] = { titel: o, uitleg: String(row[15] || "").trim(), link: link || null, images: [], aansturing };
+        if (d && e && !manuals[d]) manuals[d] = { naam: e, stappen: splitCodes(row[5]) };
+        const g = String(row[6] || "").trim().toUpperCase();
+        const titel = String(row[colTitel] || "").trim();
+        if (g && titel && !stappen[g]) {
+          const link = String(row[colLink] || "").trim();
+          stappen[g] = { titel, uitleg: String(row[colUitleg] || "").trim(), link: link || null, images: [] };
         }
       }
-      return { required_info, manuals, stappen };
+      return { producten, manuals, stappen };
     }
 
     // PNG bestanden kiezen
@@ -1038,33 +1030,33 @@
 
     // ── Handleiding tab ───────────────────────────────────────────────────────
     const manLabels = {
-      nl: { loading:"Handleiding laden…", chooseManual:"Kies een handleiding",
+      nl: { chooseProduct:"Kies een product", noManualForProduct:"Nog geen handleiding beschikbaar voor dit product.", noSteps:"Nog geen stappen beschikbaar voor deze handleiding.", loading:"Handleiding laden…", chooseManual:"Kies een handleiding",
             stepOf:(n,t)=>`Stap ${n} van ${t}`, btnPrev:"← Vorige", btnNext:"Volgende →",
             btnFinish:"✓ Klaar", btnBack:"← Terug",
             noManual:"Geen handleidingen beschikbaar.",
             tabHandleiding:"Handleiding",
             linkText:"Zie link voor meer uitleg", doneTitle:"Einde handleiding", restart:"Opnieuw starten" },
-      fr: { loading:"Chargement du manuel…", chooseManual:"Choisissez un manuel",
+      fr: { chooseProduct:"Choisissez un produit", noManualForProduct:"Aucun manuel disponible pour ce produit pour le moment.", noSteps:"Aucune étape disponible pour ce manuel pour le moment.", loading:"Chargement du manuel…", chooseManual:"Choisissez un manuel",
             stepOf:(n,t)=>`Étape ${n} sur ${t}`, btnPrev:"← Précédent", btnNext:"Suivant →",
             btnFinish:"✓ Terminé", btnBack:"← Retour",
             noManual:"Aucun manuel disponible.", tabHandleiding:"Manuel",
             linkText:"Voir le lien pour plus d'informations", doneTitle:"Fin du manuel", restart:"Recommencer" },
-      en: { loading:"Loading manual…", chooseManual:"Choose a manual",
+      en: { chooseProduct:"Choose a product", noManualForProduct:"No manual available for this product yet.", noSteps:"No steps available for this manual yet.", loading:"Loading manual…", chooseManual:"Choose a manual",
             stepOf:(n,t)=>`Step ${n} of ${t}`, btnPrev:"← Previous", btnNext:"Next →",
             btnFinish:"✓ Done", btnBack:"← Back",
             noManual:"No manuals available.", tabHandleiding:"Manual",
             linkText:"See link for more information", doneTitle:"End of manual", restart:"Start over" },
-      de: { loading:"Handbuch laden…", chooseManual:"Wählen Sie ein Handbuch",
+      de: { chooseProduct:"Wählen Sie ein Produkt", noManualForProduct:"Für dieses Produkt ist noch kein Handbuch verfügbar.", noSteps:"Für dieses Handbuch sind noch keine Schritte verfügbar.", loading:"Handbuch laden…", chooseManual:"Wählen Sie ein Handbuch",
             stepOf:(n,t)=>`Schritt ${n} von ${t}`, btnPrev:"← Zurück", btnNext:"Weiter →",
             btnFinish:"✓ Fertig", btnBack:"← Zurück",
             noManual:"Keine Handbücher verfügbar.", tabHandleiding:"Handbuch",
             linkText:"Siehe Link für weitere Informationen", doneTitle:"Ende des Handbuchs", restart:"Neu starten" },
-      es: { loading:"Cargando manual…", chooseManual:"Elija un manual",
+      es: { chooseProduct:"Elija un producto", noManualForProduct:"Todavía no hay manual disponible para este producto.", noSteps:"Todavía no hay pasos disponibles para este manual.", loading:"Cargando manual…", chooseManual:"Elija un manual",
             stepOf:(n,t)=>`Paso ${n} de ${t}`, btnPrev:"← Anterior", btnNext:"Siguiente →",
             btnFinish:"✓ Listo", btnBack:"← Volver",
             noManual:"No hay manuales disponibles.", tabHandleiding:"Manual",
             linkText:"Ver enlace para más información", doneTitle:"Fin del manual", restart:"Reiniciar" },
-      it: { loading:"Caricamento manuale…", chooseManual:"Scegliere un manuale",
+      it: { chooseProduct:"Scegliere un prodotto", noManualForProduct:"Nessun manuale ancora disponibile per questo prodotto.", noSteps:"Nessun passo ancora disponibile per questo manuale.", loading:"Caricamento manuale…", chooseManual:"Scegliere un manuale",
             stepOf:(n,t)=>`Passo ${n} di ${t}`, btnPrev:"← Precedente", btnNext:"Successivo →",
             btnFinish:"✓ Fatto", btnBack:"← Indietro",
             noManual:"Nessun manuale disponibile.", tabHandleiding:"Manuale",
@@ -1077,47 +1069,63 @@
       return manLabels[code] || manLabels.nl;
     }
 
-    // Merged state: alle componenten samengevat
-    let manMergedData = null;   // { options:[], manuals:[{id,naam,stappen,source}], sources:[] }
+    // State: { producten:[{id,naam,manuals:[MPxx]}], manuals:{MPxx:{id,naam,stappen,source}}, sources:[] }
+    let manMergedData = null;   // manControl = gekozen product
     let manControl = null, manCurrentManual = null, manCurrentSteps = [], manStep = 0;
     const manApp = () => document.getElementById("man-app");
     function manRender(html) { manApp().innerHTML = html; }
     function manCard(title, body) { return `<div class="ts-card"><h2>${title}</h2>${body}</div>`; }
 
+    // Stap 1: product kiezen (kolom B)
     function manShowControl() {
-      if (!manMergedData || !manMergedData.options.length) {
+      if (!manMergedData || !manMergedData.producten.length) {
         manRender(`<div class="ts-card"><div class="ts-error">${manT().noManual}</div></div>`); return;
       }
-      // Vraag ophalen uit de eerste beschikbare bron
-      const vraag = manMergedData.sources[0]?.required_info?.[0]?.vraag || "Type aansturing";
-      const btns = manMergedData.options.map((opt, i) => `<button class="ts-btn" data-idx="${i}">${opt}</button>`).join("");
-      manRender(manCard(vraag, `<div class="ts-btn-list">${btns}</div>`));
+      const btns = manMergedData.producten.map((p, i) => `<button class="ts-btn" data-idx="${i}">${escHtml(p.naam)}</button>`).join("");
+      manRender(`<div class="ts-card">
+        <h2 class="section-title"><span class="step-badge">1</span><span>${manT().chooseProduct}</span></h2>
+        <div class="ts-btn-list" style="margin-top:14px">${btns}</div>
+      </div>`);
       manApp().querySelectorAll(".ts-btn").forEach((btn, i) => {
-        btn.addEventListener("click", () => { manControl = manMergedData.options[i]; manShowManuals(); });
+        btn.addEventListener("click", () => { manControl = manMergedData.producten[i]; manShowManuals(); });
       });
     }
 
+    // Stap 2: handleidingen van het gekozen product (kolom C → D, naam uit kolom E)
     function manShowManuals() {
-      const list = manMergedData.manuals.filter(m =>
-        m.stappen.some(id => {
-          const s = m.source.stappen[id];
-          return s && s.aansturing && s.aansturing[manControl];
-        })
-      );
-      let btns = list.map((m, i) => `<button class="ts-btn" data-idx="${i}">${m.naam}</button>`).join("");
-      if (!btns) btns = `<div class="ts-loading">${manT().noManual}</div>`;
-      manRender(manCard(manT().chooseManual, `<div class="ts-btn-list">${btns}</div>`));
-      manApp().querySelectorAll(".ts-btn").forEach((btn, i) => {
+      const list = manControl.manuals.map(id => manMergedData.manuals[id]).filter(Boolean);
+      const body = list.length
+        ? list.map((m, i) => `<button class="ts-btn" data-idx="${i}">${escHtml(m.naam)}</button>`).join("")
+        : `<div class="ts-loading">${manT().noManualForProduct}</div>`;
+      manRender(`<div class="ts-card">
+        <div class="ts-step-header">
+          <h2 class="section-title"><span class="step-badge">2</span><span>${manT().chooseManual}</span></h2>
+          <div class="ts-action-row"><button class="ts-btn secondary ts-btn-sm" id="man-back">${manT().btnBack}</button></div>
+        </div>
+        <div class="ts-complaint-label">${escHtml(manControl.naam)}</div>
+        <div class="ts-btn-list" id="man-list">${body}</div>
+      </div>`);
+      document.getElementById("man-back").addEventListener("click", manReset);
+      document.getElementById("man-list").querySelectorAll(".ts-btn").forEach((btn, i) => {
         btn.addEventListener("click", () => {
           manCurrentManual = list[i];
-          manCurrentSteps = manCurrentManual.stappen.filter(id => {
-            const s = manCurrentManual.source.stappen[id];
-            return s && s.aansturing && s.aansturing[manControl];
-          });
+          manCurrentSteps = manCurrentManual.stappen.filter(id => manCurrentManual.source.stappen[id]);
           manStep = 0;
+          if (!manCurrentSteps.length) { manShowNoSteps(); return; }
           manShowStep();
         });
       });
+    }
+
+    function manShowNoSteps() {
+      manRender(`<div class="ts-card">
+        <div class="ts-step-header">
+          <h2 class="section-title"><span>${escHtml(manCurrentManual.naam)}</span></h2>
+          <div class="ts-action-row"><button class="ts-btn secondary ts-btn-sm" id="man-back">${manT().btnBack}</button></div>
+        </div>
+        <div class="ts-loading">${manT().noSteps}</div>
+      </div>`);
+      document.getElementById("man-back").addEventListener("click", manShowManuals);
     }
 
     function manShowStep() {
@@ -1175,15 +1183,11 @@
         if (!res.ok) throw new Error(res.status);
         const src = await res.json();
 
-        const optionSet = new Set();
-        for (const ri of src.required_info || []) {
-          for (const opt of ri.opties || []) optionSet.add(opt);
+        const manuals = {};
+        for (const [id, m] of Object.entries(src.manuals || {})) {
+          if (m.naam) manuals[id] = { id, naam: m.naam, stappen: m.stappen || [], source: src };
         }
-        const allManuals = Object.entries(src.manuals || {})
-          .filter(([, m]) => m.naam && m.stappen && m.stappen.length)
-          .map(([id, m]) => ({ id, naam: m.naam, stappen: m.stappen, source: src }));
-
-        manMergedData = { options: Array.from(optionSet), manuals: allManuals, sources: [src] };
+        manMergedData = { producten: src.producten || [], manuals, sources: [src] };
         manControl = null; manCurrentManual = null; manCurrentSteps = []; manStep = 0;
         manShowControl();
       } catch {
