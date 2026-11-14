@@ -120,7 +120,7 @@
 
       <!-- TAB: PROBLEEMOPLOSSING -->
       <div id="tab-troubleshoot" class="tab-panel">
-        <div class="ts-toolbar">
+        <div class="ts-toolbar" style="display:none;"><!-- verborgen: houdt enkel de gekozen component bij -->
           <div class="language-wrapper">
             <select id="ts-component">
               <option value="">— Kies component —</option>
@@ -235,7 +235,7 @@
         if (wasActive && btn.dataset.tab === "troubleshoot") {
           tsMatrix = null; tsControl = null; tsComplaint = null; tsCauses = []; tsStep = 0;
           document.getElementById("ts-component").value = "";
-          tsRender(`<div class="ts-loading">${tsT().start}</div>`);
+          tsShowStart();
         }
       });
     });
@@ -303,12 +303,40 @@
       return `<div class="ts-card"><h2>${title}</h2>${body}</div>`;
     }
 
+    // Stap 1: component kiezen (keuzeknoppen, zoals bij Handleiding)
+    function tsShowStart() {
+      tsUpdateComponentLabels();
+      const sel = document.getElementById("ts-component");
+      const opts = Array.from(sel.options).filter(o => o.value);
+      const title = tsT().chooseComponent.replace(/—/g, "").trim();
+      const btns = opts.map(o => `<button class="ts-btn" data-val="${o.value}">${o.text}</button>`).join("");
+      tsRender(`<div class="ts-card">
+        <h2 class="section-title"><span class="step-badge">1</span><span>${title}</span></h2>
+        <div class="ts-btn-list" style="margin-top:14px">${btns}</div>
+      </div>`);
+      tsApp().querySelectorAll(".ts-btn").forEach(btn => {
+        btn.addEventListener("click", () => { sel.value = btn.dataset.val; tsLoad(); });
+      });
+    }
+
     function tsShowControl() {
       const ri = tsMatrix.required_info[0];
+      const sel = document.getElementById("ts-component");
+      const compName = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : "";
       let btns = ri.opties.map((opt, i) =>
         `<button class="ts-btn" data-idx="${i}">${opt}</button>`).join("");
-      tsRender(tsCard(ri.vraag, `<div class="ts-btn-list">${btns}</div>`));
-      tsApp().querySelectorAll(".ts-btn").forEach((btn, i) => {
+      tsRender(`<div class="ts-card">
+        <div class="ts-step-header">
+          <h2 class="section-title"><span class="step-badge">2</span><span>${ri.vraag}</span></h2>
+          <div class="ts-action-row"><button class="ts-btn secondary ts-btn-sm" id="ts-back">${manT().btnBack}</button></div>
+        </div>
+        <div class="ts-complaint-label">${compName}</div>
+        <div class="ts-btn-list" id="ts-ctrl-list">${btns}</div>
+      </div>`);
+      document.getElementById("ts-back").addEventListener("click", () => {
+        tsMatrix = null; sel.value = ""; tsShowStart();
+      });
+      document.getElementById("ts-ctrl-list").querySelectorAll(".ts-btn").forEach((btn, i) => {
         btn.addEventListener("click", () => {
           tsControl = ri.opties[i].toLowerCase().includes("casambi") ? "casambi" : "somfy";
           tsShowComplaints();
@@ -393,7 +421,7 @@
       const component = document.getElementById("ts-component").value;
       const lang = (document.getElementById("language").value || "auto");
       const langCode = lang === "auto" ? (navigator.language || "nl").slice(0,2) : lang;
-      if (!component) { tsRender(`<div class="ts-loading">${tsT().start}</div>`); return; }
+      if (!component) { tsShowStart(); return; }
       tsRender(`<div class="ts-loading">${tsT().loading}</div>`);
       try {
         const res = await fetch(`${TS_API}/matrix?component=${component}&language=${langCode}`);
@@ -443,8 +471,9 @@
     document.getElementById("language").addEventListener("change", () => {
       tsUpdateTabLabel();
       tsUpdateComponentLabels();
-      if (document.getElementById("ts-component").value) tsLoad();
+      if (document.getElementById("ts-component").value) tsLoad(); else tsShowStart();
     });
+    tsShowStart(); // beginscherm met keuzeknoppen
 
     // ── Auth state ───────────────────────────────────────────────────────────
     let authToken    = null;
@@ -942,7 +971,7 @@
       if (tsActive) {
         tsMatrix = null; tsControl = null; tsComplaint = null; tsCauses = []; tsStep = 0;
         document.getElementById("ts-component").value = "";
-        tsRender(`<div class="ts-loading">${tsT().start}</div>`);
+        tsShowStart();
       }
 
       if (manActive) {
